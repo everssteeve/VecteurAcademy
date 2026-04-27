@@ -1,4 +1,4 @@
-# AGENT-GUIDE — [Nom du projet]
+# AGENT-GUIDE — VecteurAcademy
 
 > Ce fichier est le **contexte permanent** de l'agent IA.
 > Il est injecté dans CHAQUE session de développement.
@@ -9,10 +9,10 @@
 
 ## IDENTITÉ DU PROJET
 
-**Nom** : [Nom du projet]
-**Description** : [1-2 phrases — ce que fait le produit]
-**Domaine métier** : [Ex: e-commerce B2B, fintech, santé...]
-**Mission** : [Ce que l'équipe s'engage à livrer]
+**Nom** : VecteurAcademy
+**Description** : Plateforme de formation AI Engineering pour consultants ESN — 6 modules thématiques, quiz interactifs, assistant RAG et suivi de progression.
+**Domaine métier** : EdTech B2B — formation professionnelle continue
+**Mission** : Former des consultants ESN capables de cadrer, concevoir et livrer un système IA en production.
 
 ---
 

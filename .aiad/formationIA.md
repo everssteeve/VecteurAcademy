@@ -1,4 +1,4 @@
-# Formation AI Engineering ESN
+# VecteurAcademy — Formation AI Engineering ESN
 ### Programme complet — 6 Modules + Évaluation Finale
 **Formateurs : Steeve (pédagogie & terrain) · Dr. Lena Voss (technique & intuition fondamentale)**
 

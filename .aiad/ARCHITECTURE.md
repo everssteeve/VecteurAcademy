@@ -1,4 +1,4 @@
-# ARCHITECTURE — Plateforme Formation AI Engineering ESN
+# ARCHITECTURE — VecteurAcademy
 
 > Ce fichier est le contexte technique permanent. Un résumé condensé (max 500 tokens) est injecté dans chaque session agent.
 > Mainteneur : Steeve

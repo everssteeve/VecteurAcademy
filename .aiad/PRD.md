@@ -1,4 +1,4 @@
-# PRD : Formation AI Engineering pour Consultants ESN
+# PRD : VecteurAcademy — Formation AI Engineering pour Consultants ESN
 
 > Ce fichier est la source de vérité produit. Il est injecté en contexte agent lors des phases de cadrage uniquement.
 > Mainteneur : Steeve (formateur principal)
