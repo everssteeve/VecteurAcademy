@@ -17,6 +17,41 @@
 
 <!-- Ajoutez vos entrées ci-dessous, les plus récentes en haut -->
 
+## 2026-04-27 — SPEC-002 — Drift Check + Drift Lock
+
+**Auteur** : Steeve Evers (PE) via Claude Code
+**Raison** : Clôture de SPEC-002-module-registry après exécution agent, validation et drift check
+**Impact** : SPEC-002 → statut `done` ; Module Registry prêt pour consommation par SPEC-003 (Navigation Shell)
+
+### Fichiers produits (code)
+- `packages/shared-types/src/module.ts` — interface `ModuleMetadata`
+- `packages/shared-types/index.ts` — re-export `ModuleMetadata`
+- `apps/web/lib/module-registry.ts` — `getAllModules()` + `getModuleBySlug()` + Zod schema
+- `apps/web/lib/__tests__/module-registry.test.ts` — 8 tests Vitest
+- `apps/web/vitest.config.ts` — configuration Vitest
+- `apps/web/content/modules/01-ai-engineering.mdx` à `06-production-architecture.mdx` — 6 placeholders
+- `apps/web/package.json` — ajout `gray-matter`, `zod`, `vitest`, `@formations-ia/shared-types`
+
+### Drifts documentés
+- Message ZodError plus complet que prévu : `ZodError: invalid frontmatter in <file>: <message Zod>` (amélioration)
+- Gestion `ENOENT` ajoutée : dossier inexistant retourne `[]` au lieu de lancer une exception (amélioration)
+- Context Budget réel ~1 800 tokens vs ~800 estimés (`shared-types/index.ts` déjà peuplé)
+
+### Artefacts AIAD mis à jour
+- `specs/SPEC-002-module-registry.md` → statut `done`, critères cochés, §8 Notes de Drift Check
+- `specs/_index.md` → statut mis à jour
+- `CHANGELOG-ARTEFACTS.md` (cette entrée)
+
+---
+
+## 2026-04-27 — SPEC-002 — Gate (SQS 4/5)
+
+**Auteur** : Steeve Evers (PE) via Claude Code
+**Raison** : Execution Gate SPEC-002 — corrections des deux incohérences (nom package, Vitest)
+**Impact** : SPEC-002 → statut `ready` ; deux corrections appliquées avant lancement agent
+
+---
+
 ## 2026-04-27 — SPEC-001 — Drift Check + Drift Lock
 
 **Auteur** : Steeve Evers (PE) via Claude Code

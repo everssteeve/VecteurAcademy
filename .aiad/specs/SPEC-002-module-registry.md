@@ -3,8 +3,8 @@
 **Intent parent** : INTENT-001-skeleton-navigation-modulaire
 **Auteur** : Steeve Evers (PE)
 **Date** : 2026-04-27
-**Statut** : draft
-**SQS** : À évaluer via /sdd-gate
+**Statut** : done
+**SQS** : 4/5 ⚠️ (non-ambiguïté — voir corrections Gate 2026-04-27)
 
 ---
 
@@ -39,20 +39,20 @@ Fichiers MDX dans `apps/web/content/modules/` respectant la convention de nommag
 
 ### Cas limites
 
-- Fichier MDX sans frontmatter : Zod lève une erreur avec le nom du fichier concerné (`ZodError: missing field "title" in 01-ai-engineering.mdx`)
+- Fichier MDX sans frontmatter ou frontmatter invalide : Zod lève une erreur explicite (`ZodError: invalid frontmatter in 01-ai-engineering.mdx: <message Zod>`)
 - Fichier MDX avec `order` dupliqué : log warning en dev, tri stable par filename en fallback
-- Dossier `content/modules/` vide : `getAllModules()` retourne `[]` sans erreur (la nav affichera un état vide)
+- Dossier `content/modules/` vide ou inexistant : `getAllModules()` retourne `[]` sans erreur (la nav affichera un état vide)
 - Fichier non-MDX dans le dossier (ex: `.DS_Store`) : ignoré silencieusement (filtre sur extension `.mdx`)
 - Slug inexistant dans `getModuleBySlug` : retourne `null` (pas d'exception), la page Next.js appelle `notFound()`
 
 ## 3. Critères d'Acceptation
 
-- [ ] `getAllModules()` retourne les 6 modules triés par `order` dans un Server Component
-- [ ] Ajouter un 7e fichier MDX avec frontmatter valide suffit à le faire apparaître dans le résultat sans modifier `module-registry.ts`
-- [ ] Un frontmatter invalide (champ requis manquant) provoque une erreur Zod explicite au build (`next build`)
-- [ ] `getModuleBySlug('inexistant')` retourne `null`
-- [ ] Le type `ModuleMetadata` est importable depuis `@formationsIA/shared-types`
-- [ ] `pnpm --filter web typecheck` passing avec les types du registry
+- [x] `getAllModules()` retourne les 6 modules triés par `order` dans un Server Component
+- [x] Ajouter un 7e fichier MDX avec frontmatter valide suffit à le faire apparaître dans le résultat sans modifier `module-registry.ts`
+- [x] Un frontmatter invalide (champ requis manquant) provoque une erreur Zod explicite au build (`next build`)
+- [x] `getModuleBySlug('inexistant')` retourne `null`
+- [x] Le type `ModuleMetadata` est importable depuis `@formations-ia/shared-types`
+- [x] `pnpm --filter web typecheck` passing avec les types du registry
 
 ## 4. Interface / API
 
@@ -97,21 +97,32 @@ tags:
 - Packages à ajouter : `gray-matter`, `zod` (frontend)
 - Requis par : SPEC-003 (navigation shell)
 
-## 6. Estimation Context Budget
+## 6. Context Budget (réel)
 
-**Contexte à injecter pour cette tâche :**
-- AGENT-GUIDE (condensé) : ~200 tokens
-- ARCHITECTURE.md §4 (structure projet) : ~200 tokens
-- Cette SPEC : ~400 tokens
-- Fichiers source pertinents : `packages/shared-types/index.ts` (vide à ce stade)
-- **Total estimé** : ~800 tokens
+**Contexte injecté lors de l'exécution :**
+- AGENT-GUIDE : ~400 tokens
+- ARCHITECTURE.md §3-5 : ~500 tokens
+- Cette SPEC : ~600 tokens
+- Fichiers source inspectés : `shared-types/index.ts` (déjà peuplé), `apps/web/package.json` : ~300 tokens
+- **Total réel** : ~1 800 tokens (estimation initiale : ~800 tokens — écart dû au contenu déjà présent dans shared-types)
+- Marge : largement sous le seuil 50K ✅
 
 ## 7. Definition of Output Done (DoOD)
 
-- [ ] Code implémenté (`module-registry.ts` + types) et lint passing
-- [ ] 6 fichiers MDX placeholder créés avec frontmatter complet et valide
-- [ ] Test unitaire Vitest sur `getAllModules()` : tri, filtre extension, retour vide
-- [ ] Test unitaire Vitest sur `getModuleBySlug()` : trouvé, non trouvé
-- [ ] SPEC mise à jour si écart découvert (Drift Lock)
-- [ ] Code review passée (1 approval minimum)
-- [ ] Gouvernance RGESN : `gray-matter` + `zod` sont des dépendances légères sans impact bundle (server-only)
+- [x] Code implémenté (`module-registry.ts` + types) et lint passing
+- [x] 6 fichiers MDX placeholder créés avec frontmatter complet et valide
+- [x] Configurer Vitest dans `apps/web` : `vitest.config.ts`, script `"test": "vitest run"` dans `package.json`
+- [x] Test unitaire Vitest sur `getAllModules()` : tri par `order`, filtre extension `.mdx`, retour `[]` si dossier vide
+- [x] Test unitaire Vitest sur `getModuleBySlug()` : slug trouvé, slug inexistant → `null`
+- [x] SPEC mise à jour (Drift Lock 2026-04-27)
+- [ ] Code review passée (1 approval minimum) — en attente de PR
+- [x] Gouvernance RGESN : `gray-matter` + `zod` sont des dépendances légères sans impact bundle (server-only)
+
+## 8. Notes de Drift Check (2026-04-27)
+
+**Drifts documentés :**
+- Message ZodError : format réel `ZodError: invalid frontmatter in <file>: <message>` (plus complet que la SPEC initiale) — SPEC mise à jour
+- Gestion `ENOENT` : le dossier inexistant retourne `[]` (non prévu, amélioration) — SPEC mise à jour
+- Context Budget réel : ~1 800 tokens vs ~800 tokens estimés (shared-types déjà peuplé)
+
+**Verdict** : Aucun drift bloquant. Code et SPEC synchronisés. ✅

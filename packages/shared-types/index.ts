@@ -1,3 +1,5 @@
+export type { ModuleMetadata } from './src/module'
+
 export type UserRole = "learner" | "trainer" | "admin"
 
 export interface User {
