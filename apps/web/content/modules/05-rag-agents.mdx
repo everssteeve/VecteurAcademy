@@ -13,4 +13,225 @@ tags:
   - architecture
 ---
 
-{/* contenu à venir */}
+## Accroche
+
+💼 **Steeve**
+
+Novembre 2025. Un grand groupe d'assurance déploie un assistant IA pour ses 800 conseillers. Trois semaines après le lancement, le responsable digital reçoit un email du service juridique. Un conseiller a informé un client que son contrat couvrait les dommages liés aux catastrophes naturelles — ce qui était vrai en 2022, mais plus depuis une modification contractuelle de janvier 2025. Le modèle, lui, n'a pas connaissance de cette modification. Sa connaissance s'arrête à sa date d'entraînement.
+
+Ce scénario illustre la limite fondamentale du LLM seul : **il ne sait que ce qu'il a appris lors de son entraînement**. Il ne connaît pas vos documents internes. Il ne connaît pas les modifications contractuelles de janvier. Et il ne peut agir sur aucun système externe.
+
+Deux architectures répondent à ces deux limites. Le **RAG** ancre les réponses dans des documents réels, vérifiables, mis à jour. Les **Agents** donnent au modèle la capacité d'agir : appeler des APIs, exécuter du code, interroger des bases de données.
+
+---
+
+## Concepts clés
+
+💼 **Steeve**
+
+### Pourquoi le LLM seul ne suffit pas : trois limites structurelles
+
+**Définition**
+
+Un LLM utilisé seul présente trois limites incompressibles : **la coupure temporelle** (ses connaissances s'arrêtent à sa date d'entraînement), **l'absence de connaissances privées** (il n'a pas accès aux documents internes du client), et **la passivité** (il génère du texte mais ne peut déclencher aucune action dans un système tiers).
+
+**Exemple ESN**
+
+Un client pharmaceutique veut un assistant capable de répondre aux questions des chercheurs sur les protocoles d'essais cliniques internes. Ces protocoles sont confidentiels, mis à jour chaque trimestre, et n'ont jamais été publiés sur internet. Un LLM seul ne peut pas y répondre.
+
+> **Ce qu'il ne faut pas croire**
+> *"Un modèle entraîné récemment n'a pas ce problème de coupure temporelle."*
+> Même un modèle entraîné il y a trois mois a une coupure. Et aucun modèle public n'a été entraîné sur les documents internes de votre client.
+
+---
+
+### Architecture RAG : les trois temps de l'augmentation
+
+**Définition**
+
+Le RAG (Retrieval-Augmented Generation) fonctionne en trois phases : **l'indexation** (les documents sont découpés en chunks, transformés en vecteurs numériques par un modèle d'embedding, et stockés dans une base vectorielle), **le retrieval** (à chaque question, un vecteur de requête est calculé, et les chunks les plus proches sémantiquement sont récupérés), **la génération** (les chunks récupérés sont injectés dans le contexte du LLM avec la question de l'utilisateur).
+
+**Exemple ESN**
+
+Un client bancaire a 3 000 pages de circulaires réglementaires internes. L'indexation découpe ces pages en blocs de 500 tokens, calcule leurs embeddings, et les stocke dans une base vectorielle. Quand un analyste pose une question, le retrieval récupère les 3 à 5 passages les plus pertinents — et le LLM formule une réponse précise, citée, vérifiable.
+
+> **Ce qu'il ne faut pas croire**
+> *"Le RAG permet au LLM d'accéder à tous les documents en temps réel."*
+> Le RAG ne donne pas accès aux documents bruts — il injecte des extraits sélectionnés dans le contexte. La qualité du retrieval est le facteur limitant principal d'un système RAG — pas la qualité du LLM.
+
+---
+
+### Algorithmes de retrieval : dense, sparse, hybride
+
+**Définition**
+
+Le **retrieval dense** (ou sémantique) compare des vecteurs d'embeddings — il capture la similarité de sens. Le **retrieval sparse** (BM25, TF-IDF) repose sur la correspondance exacte de mots-clés — il est précis sur les termes exacts mais rate la synonymie. Le **retrieval hybride** combine les deux : un score pondéré entre similarité sémantique et correspondance lexicale.
+
+**Exemple ESN**
+
+Un client industriel cherche "procédure d'arrêt d'urgence pour la chaudière modèle B7". Le retrieval dense récupère des passages sémantiquement proches mais qui ne mentionnent pas le modèle B7 spécifique. Le retrieval sparse récupère les passages mentionnant exactement "B7". Le retrieval hybride combine les deux signaux pour retrouver les passages à la fois sémantiquement pertinents et mentionnant le bon référentiel.
+
+> **Ce qu'il ne faut pas croire**
+> *"Le retrieval sémantique est toujours supérieur au retrieval par mots-clés."*
+> Sur des bases documentaires avec des codes produits, des numéros de référence ou des acronymes métier, le retrieval dense peut être moins fiable que le sparse. La combinaison hybride est le standard de production.
+
+---
+
+### Qu'est-ce qu'un agent : LLM + outils + planification
+
+**Définition**
+
+Un **agent IA** est un système dans lequel un LLM agit comme un orchestrateur capable de décider quels outils utiliser, dans quel ordre, pour accomplir un objectif complexe. Il planifie une séquence d'actions, exécute des outils (APIs, requêtes SQL, code Python, recherches web), observe les résultats, et adapte son plan en conséquence.
+
+**Exemple ESN**
+
+Un client dans la gestion de patrimoine demande : "Prépare un résumé de la situation financière du client Dupont pour la réunion de demain." Un agent va : (1) interroger le CRM pour récupérer le profil du client, (2) appeler l'API du back-office pour obtenir la valorisation du portefeuille, (3) consulter la base documentaire pour les dernières notes de conseiller, (4) synthétiser le tout en un rapport structuré.
+
+> **Ce qu'il ne faut pas croire**
+> *"Un agent IA est autonome — il n'a pas besoin de supervision humaine."*
+> Les agents actuels sont puissants mais faillibles. En production, un agent sans supervision humaine sur les actions à fort impact est un risque opérationnel sérieux.
+
+---
+
+### Les modes de mémoire d'un agent
+
+**Définition**
+
+Un agent dispose de quatre types de mémoire : **la mémoire dans le contexte** (l'historique de la session en cours, limité par la fenêtre de contexte), **la mémoire externe** (base de données persistante consultable entre les sessions), **la mémoire épisodique** (traces des actions passées de l'agent), et **la mémoire sémantique** (base de connaissances structurée sur le domaine — souvent implémentée via un RAG).
+
+**Exemple ESN**
+
+Un agent de support client sans mémoire externe oublie tout à chaque nouvelle session. Avec une mémoire externe (profil client stocké en base), l'agent sait que cet utilisateur a déjà signalé ce problème deux fois, qu'il est client premium, et qu'une solution partielle a été proposée en mars.
+
+> **Ce qu'il ne faut pas croire**
+> *"Un agent avec une grande fenêtre de contexte n'a pas besoin de mémoire externe."*
+> La fenêtre de contexte est une mémoire de session — elle disparaît à la fin de la conversation. La mémoire externe est une mémoire de long terme. Les deux sont complémentaires, jamais substituables.
+
+---
+
+### Failure modes et évaluation des agents
+
+**Définition**
+
+Les agents échouent selon des patterns prévisibles : **l'hallucination d'outil** (le modèle invente un outil ou appelle un outil réel avec de mauvais paramètres), **la boucle infinie** (l'agent répète une séquence d'actions sans progresser), **l'action irréversible non contrôlée** (l'agent exécute une action destructrice sans validation humaine), et **la dérive de l'objectif** (l'agent accomplit une tâche connexe mais pas celle demandée).
+
+**Exemple ESN**
+
+Un agent de traitement de commandes interprète "annuler la commande" comme "annuler toute la commande" alors que le client voulait annuler un seul article. L'action est exécutée, la commande est annulée, le remboursement est déclenché. Sans validation humaine sur cette action irréversible, le dommage est fait.
+
+> **Ce qu'il ne faut pas croire**
+> *"Si l'agent réussit les tests sur les cas standards, il est prêt pour la production."*
+> Les cas standards ne couvrent pas les cas limites, les requêtes ambiguës, les comportements d'utilisateurs hors norme. Le pipeline d'évaluation d'un agent doit inclure des tests adversariaux.
+
+---
+
+## Sous le capot 🔬
+
+🔬 **Dr. Lena Voss**
+
+*Les embeddings : comment on transforme du sens en coordonnées dans l'espace*
+
+Un embedding est une **représentation vectorielle** d'un texte : on transforme des mots, des phrases, ou des paragraphes en une liste de nombres — un point dans un espace à plusieurs centaines ou milliers de dimensions. Des textes au sens proche produisent des vecteurs proches dans cet espace.
+
+```
+        ↑ (dimension 2 : concept de "santé")
+        │
+   médecin  ●                    ● infirmière
+        │
+   hôpital  ●
+        │
+────────┼──────────────────────────────→
+        │              ● banque   (dimension 1 : concept de "finance")
+        │
+        │      ● crédit    ● prêt
+```
+
+Le retrieval dense fonctionne ainsi :
+
+```
+Question : "Quelle est la couverture pour une fracture du poignet ?"
+                    ↓
+        Modèle d'embedding (même modèle que pour l'indexation)
+                    ↓
+        Vecteur de requête : [0.23, -0.87, 0.41, ...]
+                    ↓
+        Recherche des K vecteurs les plus proches dans la base
+        (cosine similarity ou produit scalaire)
+                    ↓
+        Chunk 1 : "Les fractures osseuses sont couvertes à 80%..."    → sim: 0.91
+        Chunk 2 : "La garantie hospitalisation inclut les soins..."   → sim: 0.87
+        Chunk 3 : "Les entorses et traumatismes du membre supérieur"  → sim: 0.84
+                    ↓
+        Les 3 chunks injectés dans le contexte du LLM
+```
+
+Ce qui est crucial : la qualité du retrieval dépend fondamentalement de **l'alignement entre le modèle d'embedding utilisé pour l'indexation et celui utilisé pour la requête**. Deux modèles différents apprennent des espaces différents — comparer leurs vecteurs n'a aucun sens.
+
+Le **chunking** conditionne ce que vous pouvez retrouver.
+
+```
+Chunk trop petit (3 phrases) :
+→ contexte insuffisant, la question ne trouve pas de réponse complète
+
+Chunk optimal (15-20 phrases) :
+→ assez de contexte pour répondre, assez ciblé pour que le signal reste fort
+
+Chunk trop grand (une page entière) :
+→ le vecteur moyenne des sujets trop différents, la similarité est diluée
+```
+
+---
+
+## Cas pratique
+
+💼 **Steeve**
+
+### Scénario : L'assistant trop ambitieux
+
+Vous êtes AI Engineer dans une ESN. Votre client est une entreprise de services à la personne. Le directeur opérationnel veut un assistant IA qui peut : répondre aux questions des coordinateurs sur les disponibilités des intervenants, envoyer des propositions de mission par SMS, mettre à jour le planning dans le logiciel métier, et répondre aux questions des familles sur la facturation.
+
+Budget : 60 000 €. Délai : 6 semaines.
+
+**Décision 1 — Comment évaluer la faisabilité et prioriser ?**
+
+*Option junior :* Accepter le brief tel quel, commencer à construire un agent avec quatre outils, et découvrir en semaine quatre que l'intégration avec le logiciel métier est bloquée par une API non documentée.
+
+*Option senior :* Décomposer le brief en deux catégories : les tâches de **consultation** (répondre aux questions — implémentables rapidement via RAG) et les tâches d'**action** (envoyer des SMS, mettre à jour le planning — nécessitent des intégrations bidirectionnelles). Proposer un MVP en deux phases : phase 1 (consultation — 4 semaines), phase 2 (action — sous réserve de faisabilité API).
+
+**Pourquoi ça change tout :** Un agent qui consulte et un agent qui agit ont des profils de risque radicalement différents. Une mauvaise réponse à une question de facturation est corrigeable. Un SMS envoyé au mauvais intervenant crée un incident opérationnel réel.
+
+**Décision 2 — Comment concevoir le retrieval pour les questions de facturation ?**
+
+*Option junior :* Indexer tous les contrats clients dans une base vectorielle avec des chunks de 1 000 tokens, et laisser le retrieval sémantique faire son travail.
+
+*Option senior :* Les questions de facturation contiennent souvent des identifiants précis (numéro de contrat, référence de prestation, nom de l'intervenant). Ces identifiants ne sont pas bien capturés par un retrieval purement sémantique. La stratégie hybride s'impose : retrieval dense pour le sens général, retrieval sparse pour les références exactes.
+
+**Décision 3 — Comment gérer les actions irréversibles de l'agent ?**
+
+*Option junior :* Laisser l'agent envoyer les SMS et mettre à jour le planning de façon autonome.
+
+*Option senior :* Implémenter un pattern de **validation humaine obligatoire** avant toute action irréversible. L'agent prépare l'action, la présente au coordinateur avec un résumé, et n'exécute qu'après validation explicite.
+
+**Pourquoi ça change tout :** Un SMS envoyé à tort à 20 intervenants est une crise opérationnelle. Le Human-in-the-loop sur les actions à fort impact est la condition de viabilité d'un système agent en production dans un secteur où les erreurs ont des conséquences humaines directes.
+
+---
+
+## Mémo flash
+
+💼 **Steeve**
+
+**En tant qu'AI Engineer en ESN, je sais que…**
+
+1. **Un LLM seul est aveugle aux connaissances privées et à l'actualité du client.** Avant de concevoir une architecture, je pose la question : "Le modèle a-t-il besoin d'informations que personne n'a publiées sur internet ?" Si oui, la réponse est le RAG.
+
+2. **La qualité d'un système RAG se joue au retrieval, pas à la génération.** Je conçois la stratégie de chunking et le choix de l'algorithme avec autant de soin que le prompt du LLM. Sur des bases documentaires métier avec des codes et des références précises, je pars du retrieval hybride par défaut.
+
+3. **Je n'utilise jamais deux modèles d'embedding différents pour indexer et requêter.** L'espace vectoriel est propre à chaque modèle. Je fixe le modèle d'embedding au début du projet et je ne le change qu'en réindexant l'intégralité de la base.
+
+4. **Un agent qui agit n'est pas un agent qui décide seul.** Pour toute action irréversible, j'implémente une validation humaine explicite. Ce n'est pas une limitation — c'est la condition de confiance qui permet à l'agent d'être déployé en production.
+
+5. **Je construis mon pipeline d'évaluation d'agent sur des cas limites, pas sur des cas standards.** Les cas limites — requêtes ambiguës, données manquantes, combinaisons inattendues — révèlent les failure modes. Un agent prêt pour la production a été testé sur ce qu'il ne sait pas encore gérer.
+
+---
+
+{/* SPEC-006 : composant Quiz ici */}

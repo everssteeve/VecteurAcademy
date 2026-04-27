@@ -13,4 +13,196 @@ tags:
   - coût
 ---
 
-{/* contenu à venir */}
+## Accroche
+
+💼 **Steeve**
+
+Avril 2025. Un appel d'offres dans le secteur de l'énergie. Le client veut un assistant IA pour ses ingénieurs de terrain. Budget serré, contraintes de souveraineté données fortes (pas de données hors UE), délai : deux mois.
+
+Trois ESN répondent. La première propose GPT-4o sans justification particulière. La deuxième propose de construire un modèle maison. La troisième arrive avec un tableau comparatif : cinq modèles évalués sur quatre critères pondérés selon le contexte client. Elle explique pourquoi Mistral Large hébergé sur OVH Cloud répond mieux aux contraintes de souveraineté, de latence et de coût — avec les chiffres pour le prouver.
+
+La troisième ESN gagne l'appel d'offres.
+
+Choisir un modèle IA sans méthode, c'est choisir un prestataire au hasard dans un annuaire. Ce module vous donne la méthode.
+
+---
+
+## Concepts clés
+
+💼 **Steeve**
+
+### Les cinq critères d'évaluation d'un modèle
+
+**Définition**
+
+Évaluer un modèle pour un projet client se fait selon cinq critères interdépendants : **qualité sur le domaine** (le modèle est-il bon sur les types de tâches du use case ?), **qualité de génération** (fluidité, cohérence, précision ?), **suivi d'instructions** (le modèle respecte-t-il les consignes du prompt système ?), **coût** (tarification par token, par appel, par hébergement), et **latence** (temps de réponse acceptable pour l'usage prévu).
+
+**Exemple ESN**
+
+Pour un assistant de support client en temps réel (retail), la latence est critique. Pour un système de synthèse documentaire juridique lancé en batch la nuit, la latence importe peu mais la qualité de génération est déterminante. Le même modèle peut être le meilleur choix pour l'un et le mauvais choix pour l'autre.
+
+> **Ce qu'il ne faut pas croire**
+> *"Le modèle avec le meilleur score sur les benchmarks publics est le meilleur pour mon projet."*
+> Les benchmarks publics mesurent des performances générales. Votre use case client est rarement standardisé.
+
+---
+
+### Le workflow de sélection de modèle
+
+**Définition**
+
+La sélection d'un modèle suit un processus en quatre étapes : **cadrage des contraintes** (budget, latence, souveraineté, langues), **présélection** (shortlist de 3 à 5 candidats compatibles avec les contraintes non négociables), **évaluation empirique** (tests sur des cas réels du client), **décision documentée** (choix justifié par les résultats, pas par la réputation du provider).
+
+**Exemple ESN**
+
+Un client bancaire impose : données hébergées en France, réponses en moins de 2 secondes, coût inférieur à 0,01€ par requête. Ces trois contraintes éliminent d'emblée GPT-4o hébergé aux États-Unis et les modèles les plus lourds. La présélection se réduit naturellement à Mistral (hébergement France via La Plateforme ou OVHcloud), Llama 3 en self-hosted, et quelques alternatives européennes.
+
+> **Ce qu'il ne faut pas croire**
+> *"On choisit le modèle une fois pour toutes au début du projet."*
+> Le choix de modèle doit être révisable. Prévoir une réévaluation semestrielle est une bonne pratique de gouvernance.
+
+---
+
+### Build vs Buy vs Open Source : trois stratégies, trois philosophies
+
+**Définition**
+
+**Buy** (APIs propriétaires : OpenAI, Anthropic, Google) : accès immédiat aux meilleurs modèles, sans infrastructure, avec des coûts prévisibles à l'usage. **Open Source** (Llama, Mistral, Qwen, Falcon) : modèles accessibles librement, hébergeables sur sa propre infrastructure, avec un contrôle total sur les données. **Build** (entraîner un modèle custom) : solution de dernier recours, réservée aux cas où aucun modèle existant ne répond au besoin — rare en ESN, très coûteux.
+
+**Exemple ESN**
+
+Un client du secteur médical avec des données ultra-sensibles (dossiers patients) ne peut pas envoyer ses données sur les serveurs d'OpenAI aux États-Unis. La stratégie Open Source avec hébergement on-premise ou en cloud souverain s'impose.
+
+> **Ce qu'il ne faut pas croire**
+> *"Open Source = gratuit."*
+> Le modèle est gratuit. L'infrastructure ne l'est pas. Héberger Llama 3 70B en production avec une latence acceptable nécessite des GPU A100 ou H100 — plusieurs milliers d'euros par mois.
+
+---
+
+### Les benchmarks publics et leurs limites
+
+**Définition**
+
+Les benchmarks publics (MMLU, HumanEval, HellaSwag, MT-Bench, LMSYS Chatbot Arena…) mesurent les performances des modèles sur des tâches standardisées et reproductibles. Ils permettent une comparaison objective entre modèles — mais sur des tâches qui ne correspondent pas nécessairement aux besoins spécifiques d'un client.
+
+**Exemple ESN**
+
+HumanEval mesure la capacité d'un modèle à générer du code Python correct. Ça ne dit rien sur la capacité du modèle à synthétiser des rapports de non-conformité en français dans le secteur agroalimentaire.
+
+> **Ce qu'il ne faut pas croire**
+> *"Le classement des benchmarks est objectif et définitif."*
+> Deux problèmes structurels : la **contamination des données** (certains providers entraînent leurs modèles sur les questions des benchmarks) et le **Goodhart's Law** (quand un benchmark devient la cible, il cesse d'être une bonne mesure).
+
+---
+
+### Concevoir un pipeline d'évaluation adapté au use case
+
+**Définition**
+
+Un pipeline d'évaluation maison (ou "evals") est un ensemble de cas de test représentatifs du use case réel, avec des critères de succès définis. Il se compose de : **un jeu de données de test** (cas réels ou réalistes), **des métriques adaptées** (exactitude, fidélité, format, refus appropriés), et **un mécanisme de scoring** (humain, automatisé par LLM-as-judge, ou hybride).
+
+**Exemple ESN**
+
+Pour un assistant de réponse aux appels d'offres publics, l'eval comprend 50 questions extraites de vrais appels d'offres du client, avec les réponses attendues validées par l'équipe commerciale. Chaque réponse du modèle est notée sur trois critères : complétude, conformité réglementaire, et ton.
+
+> **Ce qu'il ne faut pas croire**
+> *"Tester le modèle à la main sur 5 ou 10 questions suffit pour valider un choix en production."*
+> Un test manuel sur quelques cas est un bon premier filtre — pas une évaluation. Un pipeline d'eval structuré, même léger (30 à 50 cas), donne une mesure statistiquement plus fiable.
+
+---
+
+## Sous le capot 🔬
+
+🔬 **Dr. Lena Voss**
+
+*Pourquoi comparer des modèles est plus difficile qu'il n'y paraît — et ce que ça révèle sur leur nature*
+
+Il n'existe pas de métrique unique et universelle pour évaluer un LLM. Ce n'est pas un problème d'ingénierie qu'on va résoudre — c'est une propriété fondamentale de ce que ces modèles font.
+
+Les chercheurs ont développé des métriques automatiques pour contourner le jugement humain, lent et coûteux. Les plus connues sont BLEU et ROUGE — elles mesurent le chevauchement de n-grammes entre la réponse générée et une réponse de référence.
+
+```
+Référence : "Le contrat expire le 30 juin 2025."
+Réponse A :  "Le contrat prend fin le 30 juin 2025."
+Réponse B :  "Le 30 juin 2025, le contrat expire."
+
+BLEU score :
+  Réponse A → 0.41  (mots différents = score bas, malgré sens identique)
+  Réponse B → 0.67  (mêmes mots, ordre différent = score élevé)
+
+Jugement humain :
+  Réponse A → ✓ (parfaitement correcte)
+  Réponse B → ✓ (parfaitement correcte)
+```
+
+BLEU pénalise la synonymie, récompense la répétition textuelle, et rate complètement la dimension sémantique.
+
+La réponse de la communauté de recherche a été le **LLM-as-judge**. C'est remarquablement efficace — mais cela introduit ses propres biais :
+
+```
+Biais documentés du LLM-as-judge :
+─────────────────────────────────────────────────
+Position bias    → préférence pour la première réponse présentée
+Verbosity bias   → préférence pour les réponses plus longues
+Self-enhancement → un modèle juge ses propres réponses plus favorablement
+Style bias       → préférence pour un certain registre de langue
+─────────────────────────────────────────────────
+```
+
+Ce que cela implique pour votre pratique : la métrique doit être choisie en fonction de ce qui compte dans le use case, pas de ce qui est facile à mesurer. **Ne faites jamais confiance à une seule métrique.** Un bon pipeline d'éval est multiaxe — plusieurs critères, plusieurs types de mesure, et toujours une part de validation humaine sur un échantillon représentatif.
+
+---
+
+## Cas pratique
+
+💼 **Steeve**
+
+### Scénario : L'appel d'offres technique
+
+Vous êtes AI Engineer dans une ESN. Votre directeur commercial vous demande de préparer le volet technique d'une réponse à un appel d'offres. Le client est une mutuelle de santé. Le besoin : un assistant IA pour les chargés de relation client, capable de répondre aux questions des adhérents sur leurs garanties et remboursements.
+
+Contraintes : données de santé → hébergement en France obligatoire / Volume attendu : 500 à 800 requêtes par jour / Budget total : 120 000 € / Délai prototype : 6 semaines / Validation humaine avant envoi requise.
+
+**Décision 1 — Quelle stratégie Build / Buy / Open Source ?**
+
+*Option junior :* Proposer GPT-4o via l'API OpenAI — "c'est le plus performant".
+
+*Option senior :* La contrainte d'hébergement en France élimine immédiatement les APIs hébergées aux États-Unis. La stratégie se déplace vers deux options : API Mistral via La Plateforme (hébergement France, RGPD natif) ou Llama 3 en self-hosted sur infrastructure cloud souveraine. Pour 500 à 800 requêtes par jour, le coût API Mistral est nettement inférieur au coût d'hébergement GPU self-hosted — Mistral s'impose comme option principale.
+
+**Pourquoi ça change tout :** Une proposition qui ignore la contrainte de souveraineté crée un risque juridique pour le client.
+
+**Décision 2 — Comment construire l'évaluation comparative ?**
+
+*Option junior :* Tester sur 5 questions inventées, choisir celui dont les réponses "semblent meilleures".
+
+*Option senior :* Demander au client 30 à 40 vraies questions posées récemment par des adhérents, avec les réponses correctes validées par un expert interne. Concevoir un pipeline d'eval sur trois critères : exactitude, complétude, et ton. Comparer Mistral Large et Mistral Small pour arbitrer entre performance et coût.
+
+**Pourquoi ça change tout :** 30 cas réels valident ou invalident des hypothèses qu'aucun benchmark public ne peut tester.
+
+**Décision 3 — Que proposer pour la validation humaine ?**
+
+*Option junior :* Livrer un assistant qui répond directement aux adhérents, avec un bouton "signaler une erreur".
+
+*Option senior :* Concevoir un flux "Human-in-the-loop" : l'assistant génère un brouillon de réponse visible uniquement par le chargé de relation client, qui valide, corrige si besoin, puis envoie. Dans les secteurs sensibles (santé), le Human-in-the-loop est souvent une obligation réglementaire (EU AI Act).
+
+---
+
+## Mémo flash
+
+💼 **Steeve**
+
+**En tant qu'AI Engineer en ESN, je sais que…**
+
+1. **Je cadre les contraintes avant de regarder les modèles.** Souveraineté des données, budget, latence, langues — ces filtres non négociables réduisent mon espace de sélection avant toute évaluation technique.
+
+2. **Les benchmarks publics sont un point de départ, jamais un verdict.** Je les consulte pour présélectionner, jamais pour décider. Le seul benchmark qui compte vraiment est celui que je construis sur les vrais cas du client.
+
+3. **Open Source ne signifie pas gratuit.** Quand je compare les options Build / Buy / Open Source, j'inclus dans le calcul l'infrastructure GPU, la maintenance, les mises à jour de sécurité et le temps ingénieur.
+
+4. **Mon pipeline d'eval est un atout commercial.** Arriver chez un client avec 40 cas de test réels et une grille de scoring structurée, c'est une démonstration de maturité qui différencie l'ESN.
+
+5. **Je conçois l'architecture pour que le modèle soit remplaçable.** Le modèle choisi aujourd'hui ne sera peut-être pas le meilleur dans six mois. Si les couches sont découplées, c'est une configuration — pas une refonte.
+
+---
+
+{/* SPEC-006 : composant Quiz ici */}

@@ -14,4 +14,239 @@ tags:
   - monitoring
 ---
 
-{/* contenu à venir */}
+## Accroche
+
+💼 **Steeve**
+
+Février 2026. Un client dans le secteur de la grande distribution vous invite à une réunion de bilan. Il y a six mois, son équipe avait déployé un assistant IA pour les responsables de rayon. La démo avait été convaincante. Le prototype avait enthousiasmé le CODIR.
+
+Aujourd'hui, la réunion a un autre ton.
+
+En production, le système répond en 6 secondes en moyenne — les responsables de rayon ont abandonné après deux semaines. Les coûts de tokens ont explosé à 3 000 € par mois alors que l'estimation initiale était de 800 €. Trois incidents ont été remontés : deux réponses factuellement incorrectes non détectées, et une réponse qui a révélé des informations commerciales confidentielles. Le tout sans aucun dashboard de monitoring.
+
+C'est la frontière entre un prototype et un produit.
+
+Un prototype prouve que c'est possible. Un système en production prouve que c'est fiable, économique, sécurisé, et améliorable dans le temps. Cette frontière, beaucoup d'ESN la sous-estiment.
+
+---
+
+## Concepts clés
+
+💼 **Steeve**
+
+### Enrichissement du contexte : donner au modèle ce dont il a besoin, pas plus
+
+**Définition**
+
+L'enrichissement du contexte est la pratique consistant à injecter dans chaque requête les informations pertinentes pour la réponse : profil utilisateur, données métier récentes, résultats de retrieval, historique de session. L'enjeu est double — fournir assez d'information pour que le modèle réponde précisément, sans dépasser les limites de fenêtre de contexte ni diluer l'attention sur l'essentiel.
+
+**Exemple ESN**
+
+Un assistant pour les commerciaux d'un client télécoms. Sans enrichissement, le modèle reçoit la question brute. Avec enrichissement, il reçoit : le profil du client (ancienneté, usage data, équipements actuels), les trois dernières interactions CRM, les offres actuellement disponibles et leurs conditions d'éligibilité.
+
+> **Ce qu'il ne faut pas croire**
+> *"Plus on enrichit le contexte, meilleures sont les réponses."*
+> Un contexte surchargé dilue l'attention du modèle, augmente la latence, et fait exploser les coûts. L'enrichissement efficace est sélectif : on injecte ce qui est pertinent pour cette requête précise.
+
+---
+
+### Guardrails : les filets de sécurité du système
+
+**Définition**
+
+Les **guardrails** sont des mécanismes de contrôle appliqués aux entrées (input guardrails) et aux sorties (output guardrails) du modèle. Les input guardrails filtrent les requêtes inappropriées ou potentiellement malveillantes avant qu'elles n'atteignent le modèle. Les output guardrails vérifient que la réponse générée respecte les critères de qualité, de format, de sécurité et de périmètre avant d'être présentée à l'utilisateur.
+
+**Exemple ESN**
+
+Un assistant médical pour un client hospitalier. Input guardrails : détection des demandes de prescription (hors périmètre), filtrage des questions sur des personnes non-patientes. Output guardrails : vérification que la réponse ne contient pas de données de santé d'autres patients, contrôle que le format JSON de sortie est valide, détection des formulations susceptibles d'être interprétées comme un diagnostic médical.
+
+> **Ce qu'il ne faut pas croire**
+> *"Les guardrails ralentissent trop le système pour être utilisés en production."*
+> Un guardrail bien conçu ajoute 50 à 200 millisecondes au temps de réponse total. Le coût d'un incident non détecté — litige, incident de sécurité, perte de confiance client — est sans commune mesure.
+
+---
+
+### Model router et gateway : orchestrer intelligemment les modèles
+
+**Définition**
+
+Un **model router** est un composant qui dirige chaque requête vers le modèle le plus adapté selon sa nature : un modèle léger et rapide pour les requêtes simples, un modèle plus puissant pour les requêtes complexes. Une **AI gateway** est une couche d'abstraction centrale qui gère l'accès aux modèles, le contrôle des coûts, l'authentification, la journalisation, et la politique de fallback en cas d'indisponibilité d'un provider.
+
+**Exemple ESN**
+
+Un assistant interne pour une ESN de 200 collaborateurs. La majorité des requêtes sont des reformulations de texte — traitées par un modèle léger (Mistral Small, 0,002 € pour 1 000 tokens). Les requêtes de raisonnement complexe sont routées vers un modèle premium (Claude Opus, 0,075 € pour 1 000 tokens). Le coût mensuel total passe de 3 000 € (tout sur modèle premium) à 800 € (routing intelligent).
+
+> **Ce qu'il ne faut pas croire**
+> *"Une gateway IA est un luxe réservé aux grandes entreprises."*
+> Des solutions clé en main existent (LiteLLM, PortKey, Helicone) qui déploient une gateway opérationnelle en quelques heures. Dès qu'un projet fait appel à plusieurs modèles ou à des volumes significatifs, une gateway est un investissement qui s'amortit rapidement.
+
+---
+
+### Réduction de latence et stratégies de cache
+
+**Définition**
+
+La latence perçue d'un système IA se réduit par trois leviers : le **cache sémantique** (les requêtes similaires déjà traitées renvoient la réponse mise en cache, sans appel au modèle), le **streaming** (la réponse est affichée token par token dès que le modèle commence à générer), et l'**optimisation du contexte** (réduire la taille du contexte réduit mécaniquement le temps de traitement).
+
+**Exemple ESN**
+
+Un assistant FAQ pour un client retail reçoit 40 % de questions similaires ou identiques. Sans cache, chaque question déclenche un appel au modèle — latence de 1,5 à 2 secondes. Avec un cache sémantique, les questions similaires sont détectées et la réponse mise en cache est renvoyée en moins de 50 millisecondes. Les coûts baissent de 35 %.
+
+> **Ce qu'il ne faut pas croire**
+> *"Le streaming améliore la performance réelle du modèle."*
+> Le streaming améliore la **performance perçue** — l'utilisateur voit des tokens s'afficher immédiatement et ne ressent pas le temps de traitement total. La latence effective reste identique. C'est une technique d'expérience utilisateur, pas d'optimisation technique.
+
+---
+
+### Monitoring et observabilité : savoir ce qui se passe en production
+
+**Définition**
+
+L'observabilité d'un système IA repose sur quatre dimensions : **les métriques opérationnelles** (latence, taux d'erreur, coût par requête, volume d'appels), **les métriques de qualité** (taux de réponses hors périmètre, score de pertinence, taux d'hallucination détectée), **les traces** (journalisation de chaque requête — input, output, modèle utilisé, chunks retrieval, temps de traitement), et **les alertes** (déclenchements automatiques sur des seuils anormaux).
+
+**Exemple ESN**
+
+Six semaines après le lancement d'un assistant bancaire, le monitoring révèle une anomalie : le taux de réponses hors périmètre a augmenté de 3 % à 11 % en deux semaines. Sans monitoring, cette dérive serait invisible jusqu'au premier incident sérieux.
+
+> **Ce qu'il ne faut pas croire**
+> *"Les logs d'application standard suffisent pour monitorer un système IA en production."*
+> Les logs techniques capturent les erreurs système — pas les dérives qualitatives. Un système IA peut fonctionner techniquement sans erreur tout en produisant des réponses de mauvaise qualité. L'observabilité d'un système IA nécessite une instrumentation spécifique sur la qualité des réponses.
+
+---
+
+### Collecte et exploitation du feedback utilisateur
+
+**Définition**
+
+Le feedback utilisateur est le signal le plus précieux pour améliorer un système IA en production. Il se collecte à deux niveaux : **le feedback explicite** (pouces haut/bas, notes, commentaires libres) et **le feedback implicite** (reformulation de la question = réponse insatisfaisante, abandon de session, clics sur "voir plus"). Ce feedback alimente un cycle d'amélioration continue.
+
+**Exemple ESN**
+
+Après trois mois de production, l'analyse des feedbacks négatifs révèle un pattern : 60 % des pouces vers le bas concernent des questions sur une gamme spécifique (la gamme Pro X7). Investigation : les manuels de cette gamme n'ont jamais été indexés dans la base RAG — ils étaient dans un dossier réseau non connecté au pipeline d'indexation. Sans le feedback structuré, ce problème serait resté invisible pendant des mois.
+
+> **Ce qu'il ne faut pas croire**
+> *"Si les utilisateurs ne se plaignent pas, le système fonctionne bien."*
+> Les utilisateurs abandonnent avant de se plaindre. Le taux d'utilisation dans le temps (rétention à J+7, J+30) est souvent un indicateur plus fiable de la satisfaction réelle que le feedback explicite.
+
+---
+
+## Sous le capot 🔬
+
+🔬 **Dr. Lena Voss**
+
+*Le problème de la latence dans les systèmes IA : où le temps se perd vraiment, et pourquoi c'est contre-intuitif*
+
+La latence totale d'une requête dans un système RAG + LLM se décompose en plusieurs phases :
+
+```
+Requête utilisateur
+        ↓
+[1] Embedding de la requête          →  5–30 ms
+        ↓
+[2] Retrieval vectoriel              →  10–80 ms
+        ↓
+[3] Construction du contexte         →  5–20 ms
+        ↓
+[4] Envoi au LLM (API call)          →  50–300 ms  ← Time To First Token (TTFT)
+        ↓
+[5] Génération des tokens            →  500 ms–8 s ← Dépend de la longueur de sortie
+        ↓
+[6] Post-traitement + guardrails     →  20–150 ms
+        ↓
+Réponse à l'utilisateur
+─────────────────────────────────────────────────
+Latence totale perçue : 600 ms à 9 s+
+```
+
+La révélation contre-intuitive : **la phase \[5\] — la génération des tokens — domine presque toujours la latence totale**. Et cette phase dépend principalement de la **longueur de la réponse générée**.
+
+Les modèles génèrent leurs tokens de façon séquentielle — un token après l'autre. La vitesse de génération est de l'ordre de 30 à 100 tokens/seconde.
+
+```
+Réponse de 100 tokens  →  1–3 secondes de génération
+Réponse de 300 tokens  →  3–10 secondes de génération
+Réponse de 600 tokens  →  6–20 secondes de génération
+```
+
+**Contrôler la longueur des réponses est la première optimisation de latence à mettre en place**, avant d'investir dans du cache ou du routing.
+
+Il y a un second facteur souvent négligé : le **Time To First Token** (TTFT). Ce délai inclut le temps de traitement du contexte entier par le Transformer (le "prefill"). Et comme l'attention est quadratique en la longueur du contexte :
+
+```
+Impact combiné sur la latence totale :
+─────────────────────────────────────────────────────────
+                    Contexte court   Contexte long
+                    (2 000 tokens)   (8 000 tokens)
+─────────────────────────────────────────────────────────
+TTFT               ~80 ms           ~320 ms         (×4)
+─────────────────────────────────────────────────────────
+```
+
+La stratégie optimale pour un système en production combine trois leviers :
+
+**Levier 1 — Contraindre la longueur de sortie** avec un paramètre `max_tokens` adapté au use case et des instructions de format précises dans le prompt.
+
+**Levier 2 — Optimiser la taille du contexte** en ne récupérant que les N chunks les plus pertinents, en résumant l'historique de conversation plutôt que de le conserver brut.
+
+**Levier 3 — Utiliser le streaming** pour afficher les tokens au fur et à mesure — pas pour réduire la latence réelle, mais pour rendre l'attente psychologiquement acceptable.
+
+---
+
+## Cas pratique
+
+💼 **Steeve**
+
+### Scénario : De la démo au désastre silencieux
+
+Vous êtes AI Engineer dans une ESN. Il y a quatre mois, vous avez livré un assistant IA pour les équipes de souscription d'un client assureur. Aujourd'hui, le client vous convoque :
+
+- La latence moyenne est de 7,2 secondes.
+- Les coûts ont atteint 4 800 € le mois dernier — le budget annuel était de 25 000 €.
+- Deux souscripteurs ont signalé des réponses incorrectes sur des taux de sinistralité sectoriels.
+- Personne ne sait si le problème s'aggrave ou s'améliore — il n'y a aucun tableau de bord.
+
+**Décision 1 — Comment résoudre la latence et les coûts simultanément ?**
+
+*Option junior :* Migrer vers un modèle plus rapide et moins cher, sans analyser la structure des requêtes.
+
+*Option senior :* Commencer par instrumenter le système pour mesurer où le temps se perd. Analyser la longueur moyenne des réponses produites — probablement trop longue parce que le prompt ne contraint pas la sortie. Imposer un format structuré (trois sections, 200 mots maximum). Analyser la distribution des requêtes : si 30 à 40 % sont similaires, implémenter un cache sémantique. Mettre en place un router qui dirige les requêtes d'analyse complexe vers Claude Opus et les questions simples vers Mistral Small. Ces trois actions combinées peuvent réduire la latence de moitié et les coûts de 60 %.
+
+**Pourquoi ça change tout :** L'instrumentation précède l'optimisation, toujours.
+
+**Décision 2 — Comment traiter les réponses incorrectes sur les taux de sinistralité ?**
+
+*Option junior :* Ajouter un disclaimer dans chaque réponse : "Ces informations sont indicatives et doivent être vérifiées."
+
+*Option senior :* Identifier l'origine structurelle du problème. Les taux de sinistralité sectoriels ne sont probablement pas dans la base documentaire indexée — le modèle les génère depuis sa mémoire probabiliste. La solution : indexer des sources de référence officielles, et configurer le système pour qu'il cite systématiquement sa source avec chaque chiffre. Implémenter un output guardrail qui détecte les assertions numériques sans citation associée.
+
+**Pourquoi ça change tout :** Un disclaimer transfère la responsabilité de la vérification à l'utilisateur final. Une architecture qui source chaque assertion résout le problème à la racine.
+
+**Décision 3 — Comment mettre en place une observabilité efficace en urgence ?**
+
+*Option junior :* Promettre un dashboard pour le mois prochain, le temps de développer une solution sur mesure.
+
+*Option senior :* Déployer une solution d'observabilité en 48 heures avec un outil existant (Langfuse en open source ou LangSmith). Instrumenter les appels LLM avec les métadonnées minimales : user\_id, latence, coût estimé, longueur input/output, modèle utilisé. Ajouter un mécanisme de feedback deux-clics (✓ / ✗) dans l'interface. Mettre en place trois alertes immédiates : latence > 5 s sur 10 % des requêtes, coût journalier > 200 €, taux de feedback négatif > 15 %.
+
+**Pourquoi ça change tout :** Le client ne demande pas un beau tableau de bord — il demande à savoir si ça va mieux ou moins bien. Lui donner cette visibilité rapidement restaure la confiance bien plus vite qu'une promesse de solution parfaite dans six semaines.
+
+---
+
+## Mémo flash
+
+💼 **Steeve**
+
+**En tant qu'AI Engineer en ESN, je sais que…**
+
+1. **La frontière entre prototype et production se joue sur l'architecture, pas sur le modèle.** Un prototype prouve que c'est possible. Un système en production est observable, économique, sécurisé et améliorable dans le temps.
+
+2. **Je contrôle la longueur des réponses avant toute autre optimisation de latence.** La génération de tokens domine la latence totale. Un format de sortie contraint et un paramètre `max_tokens` adapté sont les premières actions à mener.
+
+3. **Mes guardrails sont doubles et indépendants du modèle.** Input pour filtrer avant le modèle, output pour vérifier après. Ces mécanismes vivent dans la couche applicative.
+
+4. **Je déploie le monitoring avant de considérer le système en production.** Traces, métriques opérationnelles, feedback utilisateur et alertes sont des livrables au même titre que les fonctionnalités.
+
+5. **Un taux d'adoption qui stagne sans plaintes formelles est une alarme, pas un succès.** Les utilisateurs abandonnent avant de se plaindre. Je surveille la rétention dans le temps, les sessions courtes, les requêtes reformulées.
+
+---
+
+{/* SPEC-006 : composant Quiz ici */}

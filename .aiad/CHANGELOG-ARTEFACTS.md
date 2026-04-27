@@ -17,6 +17,52 @@
 
 <!-- Ajoutez vos entrées ci-dessous, les plus récentes en haut -->
 
+## 2026-04-27 — SPEC-005 — Drift Check + Drift Lock
+
+**Auteur** : Steeve Evers (PE) via Claude Code
+**Raison** : Clôture de SPEC-005-mdx-content-rendering après exécution agent, validation technique et drift check
+**Impact** : SPEC-005 → statut `done` ; Infrastructure MDX opérationnelle, 6 modules peuplés avec contenu pédagogique complet
+
+### Fichiers produits (code)
+
+- `apps/web/components/mdx/mdx-components.tsx` — Mappings MDX : h1-h3, p, ul, ol, li, strong, em, blockquote (amber), hr, code, pre
+- `apps/web/app/globals.css` — `@plugin "@tailwindcss/typography";` ajouté
+- `apps/web/content/modules/01-ai-engineering.mdx` — Contenu complet (sections 1-4, 6 depuis `formationIA.md`)
+- `apps/web/content/modules/02-llm-fundamentals.mdx` — Contenu complet
+- `apps/web/content/modules/03-prompt-engineering.mdx` — Contenu complet
+- `apps/web/content/modules/04-rag-systems.mdx` — Contenu complet
+- `apps/web/content/modules/05-agents-automation.mdx` — Contenu complet
+- `apps/web/content/modules/06-production-architecture.mdx` — Contenu complet
+
+### Fichiers modifiés
+
+- `packages/shared-types/src/module.ts` — Ajout interface `ModuleWithContent`
+- `packages/shared-types/index.ts` — Export `ModuleWithContent`
+- `apps/web/lib/module-registry.ts` — `parseModule()` retourne `rawContent`, `getModuleBySlug()` retourne `ModuleWithContent | null`
+- `apps/web/app/(learner)/modules/[slug]/page.tsx` — `<MDXRemote>` + `mdxComponents` + `<article>` prose
+- `apps/web/package.json` + `pnpm-lock.yaml` — Ajout `next-mdx-remote`, `@tailwindcss/typography`
+
+### Métriques
+
+- Tests unitaires Vitest : **8/8** PASS (module-registry, aucune régression)
+- TypeCheck : **PASS** (`pnpm typecheck --filter web`)
+- Lint : **PASS** (`pnpm lint --filter web`)
+- 6 modules × 5 sections (Accroche, Concepts clés, Sous le capot, Cas pratique, Mémo flash) — ~15 000 tokens de contenu transposé
+
+### Drifts documentés (intentionnels)
+
+- **Drift A** — `mdxComponents` non typé `MDXComponents` — `mdx/types` non disponible sans `@types/mdx` ; type inféré par TS correctement
+- **Drift B** — Imports relatifs (`../../../../`) au lieu de `@/` — alias non configuré dans tsconfig, cohérence codebase
+- **Drift C** — Composant `pre` ajouté (hors liste SPEC) — nécessaire pour les blocs de code MDX stylisés
+
+### Artefacts AIAD mis à jour
+
+- `specs/SPEC-005-mdx-content-rendering.md` → statut `done`, DoOD coché, §8 Notes de Drift ajouté
+- `specs/_index.md` → statut `done`
+- `CHANGELOG-ARTEFACTS.md` (cette entrée)
+
+---
+
 ## 2026-04-27 — SPEC-004 — Drift Check + Drift Lock
 
 **Auteur** : Steeve Evers (PE) via Claude Code

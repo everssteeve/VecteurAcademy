@@ -12,4 +12,200 @@ tags:
   - llm
 ---
 
-{/* contenu à venir */}
+## Accroche
+
+💼 **Steeve**
+
+Mars 2025. Une réunion de suivi de projet chez un client du secteur assurance. Le système IA livré depuis six semaines donne globalement satisfaction — mais le responsable conformité lève la main. Il a trouvé une réponse du système qu'il considère "biaisée" sur un profil de client particulier. Il pose la question directement au consultant ESN présent : *"Est-ce que votre IA peut être raciste ?"*
+
+Silence dans la salle.
+
+Le consultant ne sait pas quoi répondre. Pas parce qu'il est incompétent. Mais parce qu'il n'a jamais vraiment compris ce qu'il y a à l'intérieur du modèle qu'il utilise. Il a branché une API. Il a fait confiance au provider. Il n'a pas les mots pour expliquer d'où viennent les biais, pourquoi ils existent, et ce qu'on peut faire.
+
+Ce module vous donne les concepts fondamentaux pour ne plus jamais être dans cette position. Un AI Engineer qui ne comprend pas le modèle qu'il orchestre, c'est un chef cuisinier qui ne sait pas ce qu'il y a dans ses ingrédients.
+
+---
+
+## Concepts clés
+
+💼 **Steeve**
+
+### Données d'entraînement et biais : ce que le modèle a "mangé"
+
+**Définition**
+
+Un Foundation Model apprend à partir d'un corpus massif de textes issus d'internet, de livres, de code, d'articles scientifiques. Ce corpus reflète les déséquilibres du monde réel : surreprésentation de certaines langues, cultures, points de vue. Le modèle hérite de ces déséquilibres, qu'on appelle **biais**.
+
+**Exemple ESN**
+
+Un client du secteur RH déploie un assistant IA pour présélectionner des candidatures. Le modèle a été entraîné sur des données historiques où les postes techniques sont majoritairement occupés par des hommes. Sans correction, le système associera plus facilement les profils masculins aux métiers techniques — reproduisant et amplifiant un biais existant.
+
+> **Ce qu'il ne faut pas croire**
+> *"Un modèle IA est neutre parce qu'il est mathématique."*
+> Les mathématiques sont neutres ; les données ne le sont pas. La neutralité n'est pas un état par défaut — c'est un objectif qu'on construit activement, avec des techniques d'évaluation, de filtrage et d'alignement.
+
+---
+
+### L'architecture Transformer : le mécanisme d'attention
+
+**Définition**
+
+Les LLMs modernes reposent sur l'architecture **Transformer**, introduite en 2017. Son mécanisme central est l'**attention** : la capacité du modèle à pondérer l'importance relative de chaque mot du contexte par rapport aux autres, pour prédire le mot suivant le plus pertinent.
+
+**Exemple ESN**
+
+Dans la phrase "Le contrat signé par le directeur expire en juin", l'attention permet au modèle de savoir que "expire" se réfère à "contrat" et non à "directeur". Cette capacité à relier des éléments distants dans un texte est ce qui rend les LLMs bien plus puissants que les modèles qui les ont précédés.
+
+> **Ce qu'il ne faut pas croire**
+> *"Le modèle lit le texte mot par mot, comme un humain."*
+> Non. Le Transformer traite le texte en parallèle, pas en séquence. L'attention est calculée sur l'ensemble du contexte disponible simultanément.
+
+---
+
+### Finetuning supervisé et RLHF : comment on rend le modèle utile
+
+**Définition**
+
+Un modèle pré-entraîné brut est bon pour "compléter du texte" — mais pas forcément pour suivre des instructions ou se comporter de façon utile et sûre. Le **finetuning supervisé** (SFT) affine le modèle sur des exemples de conversations de haute qualité. Le **RLHF** (Reinforcement Learning from Human Feedback) va plus loin : des humains comparent des réponses du modèle et indiquent laquelle est meilleure, créant un signal d'apprentissage par préférence.
+
+**Exemple ESN**
+
+GPT-4 ou Claude ont subi des étapes de finetuning et de RLHF intensives pour devenir utiles, honnêtes et inoffensifs. Quand un client vous demande "pourquoi ce modèle refuse de répondre à certaines questions ?", la réponse est dans le RLHF.
+
+> **Ce qu'il ne faut pas croire**
+> *"Finetuner un modèle, c'est la solution universelle pour l'adapter à mon domaine métier."*
+> Le finetuning est pertinent quand on veut changer le **comportement** du modèle — pas quand on veut lui donner accès à de nouvelles **connaissances**. Pour les connaissances, le RAG est souvent plus efficace, moins cher, et plus maintenable.
+
+---
+
+### Température et sampling : maîtriser la créativité
+
+**Définition**
+
+À chaque étape de génération, le modèle calcule une distribution de probabilités sur tous les tokens possibles. La **température** est un paramètre qui contrôle l'étalement de cette distribution : une température basse (proche de 0) rend le modèle déterministe et prévisible ; une température élevée (proche de 1 ou plus) rend les choix plus aléatoires et créatifs.
+
+**Exemple ESN**
+
+Pour un système de génération de comptes-rendus de réunion (précision attendue), on configurera une température basse — 0.1 ou 0.2. Pour un système de génération de slogans marketing (créativité souhaitée), on montera à 0.8 ou 0.9.
+
+> **Ce qu'il ne faut pas croire**
+> *"Une température élevée améliore la qualité des réponses."*
+> Non — elle augmente la diversité, pas la qualité. Pour des tâches nécessitant de la précision, une température élevée introduit des erreurs et des hallucinations supplémentaires.
+
+---
+
+### Outputs structurés : forcer le modèle à parler JSON
+
+**Définition**
+
+Par défaut, un LLM génère du texte libre. Les **outputs structurés** permettent de contraindre la génération pour obtenir un format défini : JSON, XML, tableau, liste balisée. Les providers modernes proposent des mécanismes natifs pour imposer un schéma de sortie.
+
+**Exemple ESN**
+
+Un client logistique veut extraire automatiquement des informations clés (expéditeur, destinataire, date, poids) depuis des emails de livraison en texte libre. Avec un schéma JSON imposé, chaque réponse est directement exploitable par le système backend — sans parsing complexe ni traitement d'erreurs ad hoc.
+
+> **Ce qu'il ne faut pas croire**
+> *"Demander au modèle 'réponds en JSON' dans le prompt suffit pour garantir un JSON valide."*
+> En production, il faut utiliser les mécanismes de contrainte natifs du provider (function calling, response\_format, grammar-based decoding) qui garantissent la conformité au schéma.
+
+---
+
+### La nature probabiliste de l'IA : apprendre à vivre avec l'incertitude
+
+**Définition**
+
+Un LLM ne "sait" pas — il **prédit**. Chaque réponse est le résultat d'un processus probabiliste : le modèle estime quelle séquence de tokens est la plus plausible étant donné le contexte. Cela implique qu'il peut être confiant et faux simultanément — c'est ce qu'on appelle une **hallucination**.
+
+**Exemple ESN**
+
+Un assistant IA pour des juristes cite une jurisprudence avec un numéro de dossier plausible, une date cohérente, un résumé crédible. Le problème : cette jurisprudence n'existe pas. Le modèle a généré une référence vraisemblable, pas une référence vraie.
+
+> **Ce qu'il ne faut pas croire**
+> *"Si le modèle est confiant dans sa réponse, c'est qu'elle est juste."*
+> Les LLMs ne savent pas ce qu'ils ne savent pas. Un modèle hallucine avec le même ton assuré qu'une réponse parfaitement exacte. La détection des hallucinations est une responsabilité de l'architecture du système, pas du modèle lui-même.
+
+---
+
+## Sous le capot 🔬
+
+🔬 **Dr. Lena Voss**
+
+*L'attention, ou comment le modèle décide à quoi "penser" pendant qu'il lit*
+
+Pour chaque token, le modèle calcule trois vecteurs : une **Query** (ce que ce token "cherche"), une **Key** (ce que ce token "offre" aux autres), et une **Value** (ce que ce token "apporte" si on l'écoute). L'attention entre deux tokens est calculée comme le produit scalaire de la Query de l'un et de la Key de l'autre.
+
+```
+Token : "expire"
+──────────────────────────────────────────────────
+           Score d'attention avec chaque token :
+
+"Le"         ░░░░░░░░░░░░░░  (faible)
+"contrat"    ████████████████ (fort — sujet logique)
+"signé"      ██████░░░░░░░░░  (moyen)
+"par"        ░░░░░░░░░░░░░░  (faible)
+"le"         ░░░░░░░░░░░░░░  (faible)
+"directeur"  ████░░░░░░░░░░░  (moyen — acteur humain)
+"en"         ██████████░░░░░  (fort — temporalité)
+"juin"       ████████████░░░  (fort — date de l'expiration)
+──────────────────────────────────────────────────
+```
+
+Ce calcul est effectué en parallèle pour **tous** les tokens du contexte, **simultanément**, par des dizaines de "têtes d'attention" différentes (multi-head attention). Chaque tête apprend à se spécialiser : l'une surveille les relations syntaxiques, une autre les relations sémantiques, une autre les références temporelles.
+
+Ce qui rend cette architecture puissante — et coûteuse — c'est que la complexité de calcul de l'attention croît de façon **quadratique** avec la longueur du contexte. Doubler la longueur du contexte, c'est quadrupler le coût de calcul. La gestion du contexte est une compétence centrale de l'AI Engineering : chaque token coûte, et un contexte trop long finit par dégrader la qualité de l'attention sur les passages importants.
+
+Le Transformer n'a pas été conçu pour "comprendre" le langage au sens où nous l'entendons. Il a été conçu pour **prédire le token suivant** aussi bien que possible. La compréhension, le raisonnement, la cohérence — ces propriétés sont **émergentes**. Elles sont apparues parce qu'à suffisamment grande échelle, la prédiction du mot suivant force le modèle à modéliser le monde qui produit ce langage.
+
+---
+
+## Cas pratique
+
+💼 **Steeve**
+
+### Scénario : "Notre IA dit n'importe quoi"
+
+Six semaines après la mise en production d'un assistant de support client IA chez un client de la grande distribution, le responsable expérience client vous contacte en urgence. Un client a demandé quelle était la politique de retour pour un produit spécifique ; l'assistant a répondu avec une politique de retour plausible mais inexistante dans les CGV réelles.
+
+**Décision 1 — Comment expliquer ce qui se passe ?**
+
+*Option junior :* Dire que "le modèle a besoin d'être mieux entraîné" sans diagnostic structuré.
+
+*Option senior :* "Le modèle ne consulte pas une base de données de vos CGV — il génère du texte plausible. Si on ne lui a pas fourni vos règles de retour dans le contexte de chaque échange, il improvise à partir de ce qu'il connaît sur les politiques de retour en général. C'est prévisible, pas une défaillance imprévisible."
+
+**Pourquoi ça change tout :** Un client qui comprend le problème peut devenir un partenaire pour le résoudre.
+
+**Décision 2 — Quelle correction architecturale proposer ?**
+
+*Option junior :* Réécrire le prompt système en ajoutant les CGV en texte brut, sans structure.
+
+*Option senior :* Concevoir un mécanisme de retrieval : indexer les CGV dans une base vectorielle, et à chaque question d'un client, récupérer dynamiquement les passages pertinents avant de les injecter dans le contexte. En parallèle, baisser la température.
+
+**Pourquoi ça change tout :** Le prompt system avec les CGV en dur pose deux problèmes : la limite de contexte et la rigidité. Le RAG résout les deux structurellement.
+
+**Décision 3 — Que dire au client sur les risques résiduels ?**
+
+*Option junior :* Promettre que "après la correction, il n'y aura plus d'erreurs".
+
+*Option senior :* "Nous allons réduire drastiquement les hallucinations en ancrant chaque réponse dans vos documents réels. Mais un système IA n'est pas un système déterministe — il restera une probabilité marginale d'erreur. C'est pourquoi nous recommandons de maintenir un système de feedback utilisateur et de monitoring des réponses."
+
+---
+
+## Mémo flash
+
+💼 **Steeve**
+
+**En tant qu'AI Engineer en ESN, je sais que…**
+
+1. **Le modèle prédit — il ne sait pas.** Un LLM génère du texte plausible, pas du texte vrai. Je conçois chaque système IA en partant du principe que l'hallucination est possible.
+
+2. **Les biais ne sont pas un bug — ils sont une propriété du corpus.** Quand un client me demande si son IA est "neutre", ma réponse honnête est : "Pas par défaut."
+
+3. **La température est mon premier levier de contrôle.** Basse pour la précision (extraction, code, rapport), plus élevée pour la créativité (rédaction, brainstorming).
+
+4. **Le finetuning n'est pas la solution par défaut.** Quand un client demande "peut-on entraîner le modèle sur nos données ?", ma première question est : "Voulez-vous changer son comportement ou ses connaissances ?" Si c'est les connaissances, je propose le RAG.
+
+5. **Je parle des outputs structurés dès le cadrage.** Si le système doit s'interfacer avec du code backend, les réponses en texte libre sont une bombe à retardement.
+
+---
+
+{/* SPEC-006 : composant Quiz ici */}

@@ -1,4 +1,4 @@
-export type { ModuleMetadata } from './src/module'
+export type { ModuleMetadata, ModuleWithContent } from './src/module'
 
 export type UserRole = "learner" | "trainer" | "admin"
 

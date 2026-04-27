@@ -1,6 +1,6 @@
 import { readFile, readdir } from "node:fs/promises"
 import path from "node:path"
-import type { ModuleMetadata } from "@formations-ia/shared-types"
+import type { ModuleMetadata, ModuleWithContent } from "@formations-ia/shared-types"
 import matter from "gray-matter"
 import { z } from "zod"
 
@@ -17,15 +17,17 @@ const ModuleMetadataSchema = z.object({
   tags: z.array(z.string()).optional(),
 })
 
-async function parseModule(filename: string): Promise<ModuleMetadata> {
+async function parseModule(
+  filename: string
+): Promise<{ metadata: ModuleMetadata; rawContent: string }> {
   const filepath = path.join(MODULES_DIR, filename)
-  const content = await readFile(filepath, "utf-8")
-  const { data } = matter(content)
+  const fileContent = await readFile(filepath, "utf-8")
+  const { data, content } = matter(fileContent)
   const result = ModuleMetadataSchema.safeParse(data)
   if (!result.success) {
     throw new Error(`ZodError: invalid frontmatter in ${filename}: ${result.error.message}`)
   }
-  return result.data
+  return { metadata: result.data, rawContent: content }
 }
 
 export async function getAllModules(): Promise<ModuleMetadata[]> {
@@ -42,14 +44,14 @@ export async function getAllModules(): Promise<ModuleMetadata[]> {
   const items = await Promise.all(
     mdxFiles.map(async (filename) => ({
       filename,
-      module: await parseModule(filename),
+      ...(await parseModule(filename)),
     }))
   )
 
   if (process.env.NODE_ENV === "development") {
     const orderCounts = new Map<number, number>()
-    for (const { module } of items) {
-      orderCounts.set(module.order, (orderCounts.get(module.order) ?? 0) + 1)
+    for (const { metadata } of items) {
+      orderCounts.set(metadata.order, (orderCounts.get(metadata.order) ?? 0) + 1)
     }
     for (const [order, count] of orderCounts) {
       if (count > 1) {
@@ -60,13 +62,23 @@ export async function getAllModules(): Promise<ModuleMetadata[]> {
 
   return items
     .sort((a, b) => {
-      if (a.module.order !== b.module.order) return a.module.order - b.module.order
+      if (a.metadata.order !== b.metadata.order) return a.metadata.order - b.metadata.order
       return a.filename.localeCompare(b.filename)
     })
-    .map((item) => item.module)
+    .map((item) => item.metadata)
 }
 
-export async function getModuleBySlug(slug: string): Promise<ModuleMetadata | null> {
-  const modules = await getAllModules()
-  return modules.find((m) => m.slug === slug) ?? null
+export async function getModuleBySlug(slug: string): Promise<ModuleWithContent | null> {
+  let entries: string[]
+  try {
+    entries = await readdir(MODULES_DIR)
+  } catch {
+    return null
+  }
+
+  const mdxFiles = entries.filter((f) => f.endsWith(".mdx"))
+  const results = await Promise.all(mdxFiles.map((filename) => parseModule(filename)))
+  const found = results.find((r) => r.metadata.slug === slug)
+  if (!found) return null
+  return { ...found.metadata, rawContent: found.rawContent }
 }

@@ -12,4 +12,183 @@ tags:
   - fondamentaux
 ---
 
-{/* contenu à venir */}
+## Accroche
+
+💼 **Steeve**
+
+Janvier 2025. Un DSI d'une banque régionale convoque son prestataire ESN en urgence. Un concurrent vient de déployer un assistant IA capable de répondre aux conseillers en agence sur des questions réglementaires complexes — en moins de deux secondes. Le DSI pose la question cash : *"Vous, vous pouvez me faire ça ?"*
+
+Le consultant senior de l'ESN hésite. Il pense aux projets ML qu'il a livrés ces trois dernières années : des modèles de scoring, du NLP de classification. Ce n'est pas tout à fait la même chose. Mais il ne sait pas exactement pourquoi. Ni comment répondre.
+
+C'est ce moment — ce flou — que ce module élimine.
+
+Depuis 2023, quelque chose s'est cassé dans le paysage de l'IA. Pas cassé en mauvais sens : cassé comme une digue. Les Foundation Models — ces modèles entraînés sur des milliards de données, capables de raisonner, générer, résumer, coder — ont rendu l'IA accessible sans expertise en machine learning. Un développeur junior peut aujourd'hui construire un assistant documentaire en quelques jours. Ce qui prenait 18 mois d'équipe data science en 2019 prend 3 semaines en 2025.
+
+Cela crée une nouvelle discipline : **l'AI Engineering**. Et pour une ESN, ignorer ce virage, c'est perdre des marchés que des équipes de 3 personnes sont en train de capturer.
+
+---
+
+## Concepts clés
+
+💼 **Steeve**
+
+### AI Engineering : une discipline à part entière
+
+**Définition**
+
+L'AI Engineering consiste à concevoir, intégrer et opérer des systèmes intelligents en s'appuyant sur des modèles pré-entraînés — sans nécessairement entraîner ces modèles soi-même. C'est l'ingénierie de l'usage, pas de la recherche.
+
+**Exemple ESN**
+
+Chez un client retail, l'équipe ne construit pas un modèle de traitement du langage naturel. Elle connecte un LLM à la base produit du client, conçoit les prompts, gère les erreurs, monitore la qualité des réponses. C'est de l'AI Engineering.
+
+> **Ce qu'il ne faut pas croire**
+> *"Faire de l'IA, c'est faire du Machine Learning."*
+> C'est la confusion la plus répandue en ESN. Un AI Engineer ne touche pas nécessairement à la data brute, aux algorithmes d'entraînement, ni aux maths d'optimisation. Il orchestre des modèles existants pour créer de la valeur métier.
+
+---
+
+### Foundation Models, LLMs, ML classique : trois familles distinctes
+
+**Définition**
+
+Le **ML classique** (SVM, Random Forest, réseaux de neurones simples) apprend une tâche précise à partir de données labellisées. Les **Foundation Models** sont entraînés sur des volumes massifs de données hétérogènes et peuvent accomplir des dizaines de tâches différentes. Les **LLMs** (Large Language Models) sont une sous-famille des Foundation Models spécialisée dans le langage.
+
+**Exemple ESN**
+
+Un client industriel utilise du ML classique pour prédire les pannes machine (données capteurs → label panne/pas panne). Le même client utilise un LLM pour générer automatiquement les rapports de maintenance à destination des techniciens. Ce sont deux projets IA — radicalement différents dans leur conception.
+
+> **Ce qu'il ne faut pas croire**
+> *"GPT-4 et un modèle de classification, c'est la même famille de technologie, juste une question de taille."*
+> Non. Ce n'est pas une question d'échelle, c'est une question d'architecture et de paradigme.
+
+---
+
+### Les cas d'usage ESN : où l'AI Engineering crée de la valeur concrète
+
+**Définition**
+
+Cinq familles de cas d'usage concentrent aujourd'hui 80% des projets AI Engineering en ESN : **coding assisté**, **chatbots et assistants métier**, **automation de processus documentaires**, **recherche sémantique**, **synthèse et extraction d'information**.
+
+**Exemple ESN**
+
+Un client dans le secteur santé a 15 ans d'archives de comptes-rendus médicaux en PDF non structurés. L'AI Engineer conçoit un pipeline qui extrait, indexe et rend ces documents interrogeables en langage naturel. Zéro entraînement de modèle — 100% d'AI Engineering.
+
+> **Ce qu'il ne faut pas croire**
+> *"Le chatbot, c'est le seul cas d'usage IA que les clients comprennent."*
+> C'est le cas d'usage visible — pas le plus impactant. La synthèse documentaire automatique, la recherche sémantique sur une base de connaissance interne, et le coding assisté génèrent souvent plus de ROI.
+
+---
+
+### Les trois couches du stack IA
+
+**Définition**
+
+Le stack IA s'organise en trois couches : la **couche modèle** (le Foundation Model, hébergé par un provider ou en self-hosted), la **couche orchestration** (les outils qui connectent le modèle aux données, aux outils, aux utilisateurs — LangChain, LlamaIndex, etc.), et la **couche application** (l'interface et la logique métier que voit l'utilisateur final).
+
+**Exemple ESN**
+
+Pour un assistant RH chez un client du secteur public : la couche modèle, c'est GPT-4o via Azure OpenAI. La couche orchestration, c'est un pipeline RAG qui va chercher les bonnes conventions collectives. La couche application, c'est l'interface de chat intégrée dans l'intranet RH.
+
+> **Ce qu'il ne faut pas croire**
+> *"Changer de modèle, c'est refaire tout le projet."*
+> Si le stack est bien découplé, changer de modèle ne devrait toucher que la couche modèle. C'est le principe même de la bonne architecture AI Engineering.
+
+---
+
+### AI Engineering vs ML Engineering vs Full-Stack : qui fait quoi ?
+
+**Définition**
+
+Le **ML Engineer** entraîne, optimise et déploie des modèles custom. Il maîtrise PyTorch, la gestion de datasets, les pipelines MLOps. L'**AI Engineer** utilise des modèles existants qu'il orchestre pour répondre à un besoin métier. Le **Full-Stack** intègre des APIs IA dans une application comme il intégrerait n'importe quelle autre API.
+
+**Exemple ESN**
+
+Dans une mission pour un client bancaire : le ML Engineer a entraîné un modèle de scoring de crédit maison. L'AI Engineer a construit l'assistant qui aide les conseillers à préparer leurs entretiens client. Le Full-Stack a intégré l'assistant dans l'application CRM.
+
+> **Ce qu'il ne faut pas croire**
+> *"Un bon développeur Full-Stack peut faire de l'AI Engineering sans formation spécifique."*
+> Appeler une API OpenAI, oui. Concevoir un système IA robuste — avec gestion des erreurs, évaluation de la qualité, protection contre les hallucinations, monitoring en production — non.
+
+---
+
+## Sous le capot 🔬
+
+🔬 **Dr. Lena Voss**
+
+*Pourquoi les Foundation Models changent tout — et pas seulement en taille*
+
+Dans le ML classique, vous entraînez un modèle à résoudre **un problème, dans un espace de données fermé**. Imaginez que vous apprenez à un enfant à reconnaître des chats en lui montrant 10 000 photos de chats et de non-chats, et rien d'autre. Il devient très bon pour ça — et uniquement pour ça.
+
+Les Foundation Models fonctionnent selon une logique radicalement différente. Imaginez maintenant un enfant qui, avant même d'apprendre votre tâche spécifique, a **lu toute la bibliothèque du monde** : romans, manuels techniques, forums de discussion, articles scientifiques, code source, contrats juridiques. Il a développé, de façon émergente, une représentation interne extraordinairement riche du langage, du raisonnement, de la causalité.
+
+Quand vous lui soumettez ensuite votre tâche, il **transfère** une compréhension générale du monde vers votre cas particulier. C'est le **transfer learning à grande échelle**.
+
+```
+ML Classique                    Foundation Model
+─────────────────               ─────────────────────────────
+Tâche A  ──→  Modèle A          Pré-entraînement massif
+Tâche B  ──→  Modèle B          (tout le langage humain)
+Tâche C  ──→  Modèle C                    ↓
+                                  Représentation générale
+                                    du monde et du sens
+                                    ↙      ↓       ↘
+                                Tâche A  Tâche B  Tâche C
+                                (même modèle de base)
+```
+
+Ce que cela implique concrètement pour vous en mission : quand un client vous demande si le modèle "connaît" son domaine métier, la bonne réponse n'est presque jamais "non, il faut l'entraîner". La bonne réponse est : "Il en sait probablement déjà beaucoup — montrons-lui ce qu'il sait, et construisons à partir de là."
+
+---
+
+## Cas pratique
+
+💼 **Steeve**
+
+### Scénario : L'ESN face au brief impossible
+
+Vous êtes consultant senior dans une ESN. Votre client — un groupe d'assurance de taille intermédiaire — vous convoque pour une réunion d'avant-vente. Le DSI et la DRH sont présents. Ils mentionnent pêle-mêle : un chatbot pour les RH, un outil pour analyser les sinistres, et un assistant pour les commerciaux. Budget : 80 000 euros. Délai : 3 mois pour un premier livrable.
+
+**Décision 1 — Comment cadrer le brief ?**
+
+*Option junior :* Promettre les trois cas d'usage, proposer un planning serré, commencer à "faire de l'IA" dès la semaine suivante.
+
+*Option senior :* Proposer un atelier de priorisation de 2 heures avant tout engagement. Identifier quel cas d'usage a le critère de succès le plus clair, la donnée la plus accessible, et le sponsor métier le plus engagé. Lancer un prototype sur ce seul cas d'usage.
+
+**Pourquoi ça change tout :** Les projets IA qui échouent en ESN échouent rarement sur la technologie. Ils échouent sur le flou de l'objectif. Trois cas d'usage en 3 mois avec 80k, c'est trois cas d'usage médiocres. Un seul cas d'usage bien cadré, c'est une référence client et un renouvellement.
+
+**Décision 2 — Quel profil mobiliser ?**
+
+*Option junior :* Proposer un ML Engineer "parce que c'est de l'IA", ou un Full-Stack "parce que c'est une application web".
+
+*Option senior :* Proposer un AI Engineer — quelqu'un qui comprend les Foundation Models, qui sait construire un pipeline RAG, qui peut évaluer la qualité des réponses du système, et qui sait parler à la fois au métier et à l'IT.
+
+**Pourquoi ça change tout :** Un ML Engineer va vouloir entraîner un modèle maison — 6 mois de travail minimum, hors budget. Un Full-Stack va appeler une API OpenAI et ne saura pas pourquoi le système hallucine.
+
+**Décision 3 — Comment présenter la solution au DSI ?**
+
+*Option junior :* Parler de "GPT", de "LLM", de "prompt engineering" — et perdre le DSI en 90 secondes.
+
+*Option senior :* Utiliser les trois couches du stack pour structurer la présentation. "On va connecter un modèle de langage pré-entraîné à vos bases documentaires internes via un système de recherche intelligent. Le commercial pose une question en français, le système retrouve le bon document, le modèle formule la réponse. Vous gardez le contrôle de vos données."
+
+---
+
+## Mémo flash
+
+💼 **Steeve**
+
+**En tant qu'AI Engineer en ESN, je sais que…**
+
+1. **Je suis un orchestrateur, pas un chercheur.** Mon rôle est de faire fonctionner des modèles existants au service d'un besoin métier — pas d'en créer de nouveaux.
+
+2. **Foundation Model ≠ ML classique ≠ LLM.** Ces trois familles ne se substituent pas l'une à l'autre. Avant de proposer une solution, je qualifie le besoin pour identifier quelle famille est pertinente.
+
+3. **Le stack IA a trois couches, et je dois les découpler.** Modèle / Orchestration / Application. Si ces couches sont imbriquées dans mon architecture, changer de modèle ou d'outil d'orchestration revient à tout refaire.
+
+4. **Je priorise un seul cas d'usage, bien défini, avec un critère de succès mesurable.** Face à un brief multi-cas d'usage avec budget et délai contraints, je propose un atelier de priorisation avant tout engagement technique.
+
+5. **Je parle le langage du DSI, pas celui du papier de recherche.** "Modèle pré-entraîné connecté à vos données via un système de recherche intelligent" — voilà ce que comprend un décideur.
+
+---
+
+{/* SPEC-006 : composant Quiz ici */}

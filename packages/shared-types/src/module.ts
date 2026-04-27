@@ -8,3 +8,7 @@ export interface ModuleMetadata {
   audience: ('consultant' | 'commercial')[]
   tags?: string[]
 }
+
+export interface ModuleWithContent extends ModuleMetadata {
+  rawContent: string
+}

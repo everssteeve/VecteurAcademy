@@ -1,5 +1,7 @@
+import { MDXRemote } from "next-mdx-remote/rsc"
 import { notFound } from "next/navigation"
 import { Breadcrumb } from "../../../../components/layout/breadcrumb"
+import { mdxComponents } from "../../../../components/mdx/mdx-components"
 import { getAllModules, getModuleBySlug } from "../../../../lib/module-registry"
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
@@ -64,12 +66,9 @@ export default async function ModulePage({
         <p className="text-lg text-gray-600 dark:text-gray-300">{module.description}</p>
       </div>
 
-      <div
-        className="p-8 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 text-center text-gray-400 dark:text-gray-500 mb-8"
-        aria-label="Zone de contenu"
-      >
-        <p>Contenu à venir</p>
-      </div>
+      <article className="prose prose-gray dark:prose-invert max-w-none mb-8">
+        <MDXRemote source={module.rawContent} components={mdxComponents} />
+      </article>
 
       <nav
         aria-label="Navigation entre modules"
