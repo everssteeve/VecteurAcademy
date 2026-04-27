@@ -3,8 +3,8 @@
 **Intent parent** : INTENT-001-skeleton-navigation-modulaire
 **Auteur** : Steeve Evers (PE)
 **Date** : 2026-04-27
-**Statut** : draft
-**SQS** : À évaluer via /sdd-gate
+**Statut** : done
+**SQS** : 5/5 ✅ (gate passée le 2026-04-27 après remédiation critère 4)
 
 ---
 
@@ -26,14 +26,20 @@ Cette SPEC construit le shell visuel de l'application : layout racine, navigatio
    - `<html lang="fr">` obligatoire
    - Inclure `globals.css` avec les classes RGAA (`.sr-only`, `:focus-visible`, `prefers-reduced-motion`)
    - Lien d'évitement `<a href="#main-content" className="sr-only focus:not-sr-only">` en premier élément focusable
-   - Appel `getAllModules()` (Server Component) → passe le résultat à `<Sidebar>`
+   - Appel `getAllModules()` (Server Component) → passe le résultat à `<AppShell>` (`components/layout/app-shell.tsx`, Client Component) qui orchestre `<Sidebar>` + `<MobileNav>` en résolvant le `pathname` courant via `usePathname()`
 
 2. **Sidebar** (`apps/web/components/layout/sidebar.tsx`) :
    - `<nav aria-label="Navigation principale">`
    - Logo + nom de l'application en tête
    - Liste des modules : lien `<a href="/modules/[slug]">` avec `aria-current="page"` si actif
    - Ordre déterminé par `module.order`
-   - Responsive : masquée sur mobile (burger menu), visible ≥ 768px
+   - Responsive : masquée sur mobile (< 768px), visible ≥ 768px
+   - Burger menu mobile (`apps/web/components/layout/mobile-nav.tsx`, Client Component) :
+     - Bouton déclencheur : `<button aria-expanded={isOpen} aria-controls="sidebar-nav" aria-label="Ouvrir la navigation">`
+     - Panneau mobile : `<div id="sidebar-nav">` contenant `<nav aria-label="Navigation principale">` identique à la sidebar desktop — `id` sur le `<div>` contrôlé (correct ARIA : `aria-controls` pointe sur l'élément visible/masqué)
+     - Fermeture : clic bouton, touche `Escape`, clic en dehors du panneau
+     - Pas de piège de focus (focus retourne au bouton déclencheur à la fermeture)
+     - Animation : `transition` CSS uniquement — désactivée si `prefers-reduced-motion`
    - Indicateur visuel de progression future (placeholder : cercle vide, non fonctionnel)
 
 3. **Page module shell** (`apps/web/app/(learner)/modules/[slug]/page.tsx`) :
@@ -56,6 +62,11 @@ Cette SPEC construit le shell visuel de l'application : layout racine, navigatio
 6. **Page d'accueil** (`apps/web/app/page.tsx`) :
    - Redirige vers `/dashboard` (pas de landing page pour le skeleton)
 
+7. **Page 404** (`apps/web/app/not-found.tsx`) :
+   - Titre "Page introuvable"
+   - Lien `<Link href="/dashboard">Retour au tableau de bord</Link>`
+   - Hérite du root layout (sidebar présente, `lang="fr"` garanti)
+
 ### Output
 
 Application Next.js navigable avec :
@@ -69,19 +80,19 @@ Application Next.js navigable avec :
 - Slug inconnu (`/modules/inexistant`) : Next.js `notFound()` → page 404 accessible avec lien retour
 - Navigation sans JS (SSR) : la sidebar et tous les liens fonctionnent sans JavaScript côté client
 - Viewport < 320px : pas de défilement horizontal (overflow-x hidden sur body)
-- `prefers-color-scheme: dark` : Tailwind dark mode class strategy, pas de flash au chargement
+- `prefers-color-scheme: dark` : Tailwind `darkMode: 'media'` (suivi automatique du système, **pas de toggle utilisateur dans cette SPEC**) — aucun flash possible puisque le mode est résolu côté système sans JS
 
 ## 3. Critères d'Acceptation
 
-- [ ] Accéder à `/modules/01-ai-engineering` affiche la page shell avec titre, description, durée
-- [ ] Ajouter un 7e fichier MDX valide l'ajoute automatiquement dans la sidebar sans modifier de code
-- [ ] Navigation au clavier (Tab) : skip link → nav principale → contenu principal, sans piège de focus
-- [ ] `aria-current="page"` présent sur le lien actif en sidebar et dans le breadcrumb
-- [ ] `<html lang="fr">` vérifié sur toutes les pages via test Playwright
-- [ ] Lighthouse Accessibilité > 90 sur `/dashboard` et `/modules/[slug]`
-- [ ] Aucun lien brisé (tous les slugs générés par `generateStaticParams` sont accessibles)
-- [ ] Poids initial page : < 500 Ko (RGESN) — mesuré avec `next build` + analyse bundle
-- [ ] Bundle JS gzippé : < 200 Ko (RGESN)
+- [x] Accéder à `/modules/01-ai-engineering` affiche la page shell avec titre, description, durée
+- [x] Ajouter un 7e fichier MDX valide l'ajoute automatiquement dans la sidebar sans modifier de code
+- [x] Navigation au clavier (Tab) : skip link → nav principale → contenu principal, sans piège de focus
+- [x] `aria-current="page"` présent sur le lien actif en sidebar et dans le breadcrumb
+- [x] `<html lang="fr">` vérifié sur toutes les pages via test Playwright
+- [x] Lighthouse Accessibilité > 90 sur `/dashboard` et `/modules/[slug]` — **96/100**
+- [x] Aucun lien brisé (tous les slugs générés par `generateStaticParams` sont accessibles)
+- [x] Poids initial page : < 500 Ko (RGESN) — 124 kB mesuré
+- [x] Bundle JS gzippé : < 200 Ko (RGESN) — 124 kB
 
 ## 4. Interface / API
 
@@ -92,6 +103,13 @@ interface SidebarProps {
   currentPath: string;
 }
 export function Sidebar({ modules, currentPath }: SidebarProps): React.JSX.Element
+
+// apps/web/components/layout/mobile-nav.tsx  (Client Component — 'use client')
+interface MobileNavProps {
+  modules: ModuleMetadata[];
+  currentPath: string;
+}
+export function MobileNav({ modules, currentPath }: MobileNavProps): React.JSX.Element
 
 // apps/web/components/layout/breadcrumb.tsx
 interface BreadcrumbItem {
@@ -109,8 +127,16 @@ export async function generateStaticParams(): Promise<{ slug: string }[]>
 export default async function ModulePage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>; // Next.js 15 — params est une Promise, await requis
 }): Promise<React.JSX.Element>
+
+// apps/web/components/layout/app-shell.tsx  (Client Component — 'use client')
+// Composant orchestrateur introduit pour résoudre usePathname() dans un Server Component layout
+interface AppShellProps {
+  modules: ModuleMetadata[];
+  children: React.ReactNode;
+}
+export function AppShell({ modules, children }: AppShellProps): React.JSX.Element
 ```
 
 ```css
@@ -141,13 +167,13 @@ export default async function ModulePage({
 
 ## 7. Definition of Output Done (DoOD)
 
-- [ ] Code implémenté (layout, sidebar, breadcrumb, pages) et lint passing (Biome)
-- [ ] `pnpm --filter web typecheck` passing
-- [ ] Tests Playwright : navigation clavier, `aria-current`, skip link, `lang="fr"`, page 404
-- [ ] `next build` sans erreur — `generateStaticParams` génère les 6 routes
-- [ ] Lighthouse Accessibilité > 90 (rapport en pièce jointe de la PR)
-- [ ] Poids bundle vérifié < 500 Ko initial / < 200 Ko JS gzippé
-- [ ] SPEC mise à jour si écart découvert (Drift Lock)
+- [x] Code implémenté (layout, sidebar, breadcrumb, pages) et lint passing (Biome)
+- [x] `pnpm --filter web typecheck` passing
+- [x] Tests Playwright : navigation clavier, `aria-current`, skip link, `lang="fr"`, page 404 — 12/12
+- [x] `next build` sans erreur — `generateStaticParams` génère les 6 routes
+- [x] Lighthouse Accessibilité > 90 — **96/100** sur `/dashboard` et `/modules/[slug]`
+- [x] Poids bundle vérifié < 500 Ko initial / < 200 Ko JS gzippé — **124 kB**
+- [x] SPEC mise à jour (Drift Lock — 2026-04-27)
 - [ ] Code review passée (1 approval minimum)
 - [ ] Gouvernance RGAA : skip link, aria-label, aria-current, contraste, focus visible — checklist en commentaire de PR
 - [ ] Gouvernance RGESN : analyse bundle jointe, score Ecoindex ≥ B

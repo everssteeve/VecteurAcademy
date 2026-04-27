@@ -17,6 +17,47 @@
 
 <!-- Ajoutez vos entrées ci-dessous, les plus récentes en haut -->
 
+## 2026-04-27 — SPEC-003 — Drift Check + Drift Lock
+
+**Auteur** : Steeve Evers (PE) via Claude Code
+**Raison** : Clôture de SPEC-003-navigation-shell après exécution agent, validation (Lighthouse 96/100, 12/12 E2E) et drift check
+**Impact** : SPEC-003 → statut `done` ; Navigation Shell prête, dépendance SPEC-004 (Auth Shell) débloquée
+
+### Fichiers produits (code)
+- `apps/web/app/layout.tsx` — Root layout avec skip link, `lang="fr"`, `getAllModules()` → AppShell
+- `apps/web/app/page.tsx` — Redirect `/` → `/dashboard`
+- `apps/web/app/globals.css` — Ajout `overflow-x: hidden`
+- `apps/web/app/not-found.tsx` — Page 404 accessible avec lien retour `/dashboard`
+- `apps/web/app/(learner)/dashboard/page.tsx` — Cards modules, liens, placeholder "non commencé"
+- `apps/web/app/(learner)/modules/[slug]/page.tsx` — Shell module, `generateStaticParams`, `notFound()`, prev/next
+- `apps/web/components/layout/app-shell.tsx` — Client Component orchestrateur (usePathname)
+- `apps/web/components/layout/sidebar.tsx` — Nav desktop ≥ 768px, `aria-current`, 0-module guard
+- `apps/web/components/layout/mobile-nav.tsx` — Burger menu, `aria-expanded`, Escape, clic extérieur
+- `apps/web/components/layout/breadcrumb.tsx` — `aria-label="Fil d'Ariane"`, `aria-current="page"`
+- `apps/web/e2e/navigation.spec.ts` — 12 tests Playwright (tous passent)
+- `apps/web/playwright.config.ts` — Config Playwright Chromium
+- `apps/web/package.json` + `pnpm-lock.yaml` — Ajout `@playwright/test`
+- `apps/web/vitest.config.ts` — Exclusion `e2e/` (correction découverte en validation)
+
+### Métriques
+- Lighthouse Accessibilité : **96/100** sur `/dashboard` et `/modules/ai-engineering`
+- Bundle JS First Load : **124 kB** (< 200 Ko RGESN)
+- Tests E2E : **12/12** PASS
+- Tests unitaires : **8/8** PASS
+
+### Drifts documentés (intentionnels)
+- `AppShell` (Client Component) introduit — nécessaire pour `usePathname()` dans un root layout Server Component
+- `id="sidebar-nav"` sur `<div>` wrapper plutôt que `<nav>` — correction ARIA (`aria-controls` pointe sur l'élément contrôlé)
+- `params: Promise<{ slug: string }>` dans `ModulePage` — adaptation Next.js 15 (type async sur params)
+- `not-found.tsx` ajouté (non listé dans §2 Processing initial) — satisfait le cas limite "page 404 accessible avec lien retour"
+
+### Artefacts AIAD mis à jour
+- `specs/SPEC-003-navigation-shell.md` → statut `done`, critères cochés, drifts documentés, `AppShell` ajouté §4
+- `specs/_index.md` → statut mis à jour
+- `CHANGELOG-ARTEFACTS.md` (cette entrée)
+
+---
+
 ## 2026-04-27 — SPEC-002 — Drift Check + Drift Lock
 
 **Auteur** : Steeve Evers (PE) via Claude Code
