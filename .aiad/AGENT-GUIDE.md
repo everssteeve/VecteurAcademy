@@ -113,4 +113,6 @@
 
 | Date | Intention exprimée | Résultat obtenu | Apprentissage |
 |------|--------------------|-----------------|---------------|
-| | | | |
+| 2026-04-27 | Page login sans JS requis pour la soumission (progressive enhancement) | `useActionState` (React 19) exige JS — la soumission ne fonctionne pas sans JS | Spécifier "sans JS" impose une architecture Server Component pur avec `<form action={serverAction}>` natif. Incompatible avec validation Zod client en même composant. Choisir explicitement entre progressive enhancement et DX React. |
+| 2026-04-27 | `NEXTAUTH_URL` suffisant pour Auth.js v5 | Auth.js v5 requiert aussi `AUTH_URL` + `AUTH_TRUST_HOST=true` pour les environnements non-HTTPS | Auth.js v5 (next-auth@beta) a changé ses env vars : `AUTH_URL` remplace `NEXTAUTH_URL` (compat shim conservé). `AUTH_TRUST_HOST=true` obligatoire en développement local. À documenter dans .env.example dès l'installation. |
+| 2026-04-27 | "Tests jest-axe" dans DoOD | Projet utilise Vitest + Playwright — jest-axe non installé, assertions équivalentes via Playwright | Aligner le DoOD avec le stack de test réel du projet. Si jest-axe est voulu, l'ajouter explicitement dans la SPEC des deps. Sinon, écrire "assertions d'accessibilité (Playwright ou jest-axe)". |

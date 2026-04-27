@@ -3,8 +3,8 @@
 **Intent parent** : INTENT-001-skeleton-navigation-modulaire
 **Auteur** : Steeve Evers (PE)
 **Date** : 2026-04-27
-**Statut** : draft
-**SQS** : À évaluer via /sdd-gate
+**Statut** : done
+**SQS** : 5/5 ✅ (Execution Gate passée le 2026-04-27)
 
 ---
 
@@ -18,7 +18,8 @@ Les routes `/dashboard` et `/modules/[slug]` doivent être protégées. Cette SP
 
 - Credentials : email (string, format email) + mot de passe (string, min 8 chars) soumis via formulaire
 - Variable d'environnement `JWT_SECRET` (string, min 32 chars)
-- Variable d'environnement `NEXTAUTH_URL` (ex: `http://localhost:3000`)
+- Variable d'environnement `AUTH_URL` (ex: `http://localhost:3000`) — Auth.js v5 (alias `NEXTAUTH_URL` conservé pour compat)
+- Variable d'environnement `AUTH_TRUST_HOST=true` — requis pour environnements non-HTTPS (dev local, Railway)
 
 ### Processing
 
@@ -41,15 +42,15 @@ Les routes `/dashboard` et `/modules/[slug]` doivent être protégées. Cette SP
 
 4. **Page `/login`** (`apps/web/app/(auth)/login/page.tsx`) :
    - Formulaire : champ email (type email, autocomplete="email"), champ password (type password, autocomplete="current-password"), bouton "Se connecter"
-   - Validation client Zod (email format, password min 8)
+   - Validation client Zod via `useActionState` + `onSubmit` (React 19) — nécessite JS
    - Affichage d'erreur accessible : `role="alert"` sur le message d'erreur, `aria-invalid="true"` sur le champ concerné
-   - `<form>` avec `action` server action Auth.js (pas de JS requis pour la soumission de base)
+   - Server action `loginAction` dans `app/(auth)/actions.ts` — `signIn("credentials", { redirectTo: callbackUrl })`
+   - Note : progressive enhancement "sans JS" non implémenté — voir Human Learning AGENT-GUIDE 2026-04-27
 
 5. **Page `/register`** (`apps/web/app/(auth)/register/page.tsx`) :
-   - Formulaire : email, password, confirmation password
-   - Validation client Zod
-   - Affiche un message "Inscription temporairement indisponible — fonctionnalité à venir" (stub visible)
-   - La soumission ne fait rien (pas de backend à ce stade) — ne pas silencieusement ignorer, afficher le message stub
+   - Page stub uniquement — aucun formulaire (formulaire non pertinent sans backend)
+   - Affiche le message "Inscription temporairement indisponible — fonctionnalité à venir" avec `role="alert"` + `aria-live="polite"`
+   - Lien retour vers `/login`
 
 6. **Session côté client** :
    - `SessionProvider` dans le layout `(auth)` ou root layout
@@ -72,14 +73,14 @@ Les routes `/dashboard` et `/modules/[slug]` doivent être protégées. Cette SP
 
 ## 3. Critères d'Acceptation
 
-- [ ] Accéder à `/dashboard` sans session → redirigé vers `/login`
-- [ ] Connexion avec email valide + password ≥ 8 chars → session créée, redirection vers `/dashboard`
-- [ ] JWT décodable dans un Server Component via `auth()` avec `{ sub, email, role }`
-- [ ] Page `/login` navigable au clavier sans piège de focus
-- [ ] Message d'erreur de validation affiché avec `role="alert"` (testé via Playwright + jest-axe)
-- [ ] Page `/register` affiche le message stub "fonctionnalité à venir" visible
-- [ ] `pnpm --filter web typecheck` passing avec les types Auth.js v5
-- [ ] `JWT_SECRET` absent → `next dev` log une erreur explicite au démarrage
+- [x] Accéder à `/dashboard` sans session → redirigé vers `/login`
+- [x] Connexion avec email valide + password ≥ 8 chars → session créée, redirection vers `/dashboard`
+- [x] JWT décodable dans un Server Component via `auth()` avec `{ sub, email, role }`
+- [x] Page `/login` navigable au clavier sans piège de focus
+- [x] Message d'erreur de validation affiché avec `role="alert"` (testé via Playwright)
+- [x] Page `/register` affiche le message stub "fonctionnalité à venir" visible
+- [x] `pnpm --filter web typecheck` passing avec les types Auth.js v5
+- [x] `JWT_SECRET` absent → erreur explicite au démarrage (`throw Error`)
 
 ## 4. Interface / API
 
@@ -116,11 +117,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: { signIn: "/login" },
 });
 
-// apps/web/middleware.ts
-export { auth as middleware } from "@/auth";
+// apps/web/middleware.ts — pattern custom (gère protect + redirect depuis /login)
+import { auth } from "@/auth"
+
+export default auth((req) => {
+  const isLoggedIn = !!req.auth?.user
+  const { pathname } = req.nextUrl
+  const isProtected = pathname.startsWith("/dashboard") || pathname.startsWith("/modules")
+
+  if (isProtected && !isLoggedIn) {
+    const loginUrl = new URL("/login", req.nextUrl)
+    loginUrl.searchParams.set("callbackUrl", pathname + req.nextUrl.search)
+    return Response.redirect(loginUrl)
+  }
+  if (pathname === "/login" && isLoggedIn) {
+    return Response.redirect(new URL("/dashboard", req.nextUrl))
+  }
+})
+
 export const config = {
-  matcher: ["/dashboard/:path*", "/modules/:path*"],
-};
+  matcher: ["/dashboard/:path*", "/modules/:path*", "/login"],
+}
 ```
 
 ```typescript
@@ -157,11 +174,35 @@ export const registerSchema = loginSchema.extend({
 
 ## 7. Definition of Output Done (DoOD)
 
-- [ ] Code implémenté (`auth.ts`, `middleware.ts`, pages login/register) et lint passing
-- [ ] `pnpm --filter web typecheck` passing
-- [ ] Tests Playwright : redirect non-auth, connexion stub, session persistée, page register stub
-- [ ] Tests jest-axe : formulaire login (aria-invalid, role="alert", labels associés)
-- [ ] SPEC mise à jour si écart découvert (Drift Lock)
-- [ ] Code review passée (1 approval minimum)
-- [ ] Gouvernance RGPD : aucune donnée personnelle persistée en base à ce stade (stub) — documenté dans la SPEC
-- [ ] Gouvernance RGAA : formulaires avec labels explicites, erreurs accessibles, focus visible
+- [x] Code implémenté (`auth.ts`, `middleware.ts`, pages login/register) et lint passing
+- [x] `pnpm --filter web typecheck` passing
+- [x] Tests Playwright : redirect non-auth, connexion stub, session persistée, page register stub — 27/27 ✅
+- [x] Tests accessibilité Playwright (aria-invalid, role="alert", labels associés) — jest-axe remplacé par Playwright (Human Learning #3)
+- [x] SPEC mise à jour (écarts documentés)
+- [ ] Code review passée (1 approval minimum) — en attente
+- [x] Gouvernance RGPD : aucune donnée personnelle persistée en base à ce stade (stub) — confirmé
+- [x] Gouvernance RGAA : formulaires avec labels explicites, erreurs accessibles, focus visible — confirmé
+
+## 8. Notes de Drift Check (2026-04-27)
+
+### Drifts intentionnels documentés
+
+**Drift A — Middleware pattern**
+- Spécifié : `export { auth as middleware }` avec matcher 2 routes
+- Implémenté : `auth((req) => {...})` avec matcher 3 routes (+ `/login`)
+- Raison : le pattern custom est nécessaire pour couvrir les 2 comportements (protect + redirect depuis /login). Le snippet Interface §4 a été mis à jour.
+
+**Drift B — Page `/register` sans formulaire**
+- Spécifié : "Formulaire : email, password, confirmation password" + message stub
+- Implémenté : message stub uniquement, pas de formulaire
+- Raison : un formulaire sans backend n'apporte rien et induirait l'utilisateur en erreur. Le message stub satisfait l'intention.
+
+**Drift C — Variables d'environnement Auth.js v5**
+- Spécifié : `JWT_SECRET` + `NEXTAUTH_URL`
+- Implémenté : + `AUTH_URL` + `AUTH_TRUST_HOST=true` (requis par next-auth@beta)
+- Raison : Auth.js v5 a changé ses variables d'environnement. `.env.example` et Input §2 mis à jour.
+
+**Drift D — Layout refactor (non prévu)**
+- `apps/web/app/layout.tsx` : AppShell retiré → AuthSessionProvider ajouté
+- `apps/web/app/(learner)/layout.tsx` : nouveau fichier portant l'AppShell
+- Raison : nécessaire pour que les pages `/login` et `/register` s'affichent sans sidebar.

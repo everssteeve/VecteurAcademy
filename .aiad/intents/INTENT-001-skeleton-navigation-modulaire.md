@@ -2,7 +2,7 @@
 
 **Auteur** : Steeve Evers (AIAD)
 **Date** : 2026-04-27
-**Statut** : draft
+**Statut** : livré
 
 ---
 
@@ -29,7 +29,7 @@ L'implémentation a dérivé si **l'ajout d'un nouveau module impose de modifier
 
 ## SPECs liées
 
-- [ ] [SPEC-001 — Monorepo Bootstrap](../specs/SPEC-001-monorepo-bootstrap.md)
-- [ ] [SPEC-002 — Module Registry](../specs/SPEC-002-module-registry.md)
-- [ ] [SPEC-003 — Navigation Shell](../specs/SPEC-003-navigation-shell.md)
-- [ ] [SPEC-004 — Auth Shell](../specs/SPEC-004-auth-shell.md)
+- [x] [SPEC-001 — Monorepo Bootstrap](../specs/SPEC-001-monorepo-bootstrap.md)
+- [x] [SPEC-002 — Module Registry](../specs/SPEC-002-module-registry.md)
+- [x] [SPEC-003 — Navigation Shell](../specs/SPEC-003-navigation-shell.md)
+- [x] [SPEC-004 — Auth Shell](../specs/SPEC-004-auth-shell.md)

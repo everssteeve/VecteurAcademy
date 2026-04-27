@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
-import { AppShell } from "../components/layout/app-shell"
-import { getAllModules } from "../lib/module-registry"
+import { AuthSessionProvider } from "../components/providers/session-provider"
 import "./globals.css"
 
 const geistSans = Geist({
@@ -19,13 +18,11 @@ export const metadata: Metadata = {
   description: "Plateforme de formation AI Engineering pour consultants ESN",
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const modules = await getAllModules()
-
   return (
     <html lang="fr">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
@@ -35,7 +32,7 @@ export default async function RootLayout({
         >
           Aller au contenu principal
         </a>
-        <AppShell modules={modules}>{children}</AppShell>
+        <AuthSessionProvider>{children}</AuthSessionProvider>
       </body>
     </html>
   )

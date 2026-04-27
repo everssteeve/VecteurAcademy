@@ -6,7 +6,7 @@
 
 | ID | Titre | Auteur | Date | SPECs liées | Statut |
 |----|-------|--------|------|-------------|--------|
-| INTENT-001 | Skeleton navigation modulaire | Steeve Evers | 2026-04-27 | À créer | draft |
+| INTENT-001 | Skeleton navigation modulaire | Steeve Evers | 2026-04-27 | SPEC-001 à 004 | livré |
 
 ## Statuts possibles
 

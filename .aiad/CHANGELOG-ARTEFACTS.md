@@ -17,6 +17,54 @@
 
 <!-- Ajoutez vos entrées ci-dessous, les plus récentes en haut -->
 
+## 2026-04-27 — SPEC-004 — Drift Check + Drift Lock
+
+**Auteur** : Steeve Evers (PE) via Claude Code
+**Raison** : Clôture de SPEC-004-auth-shell après exécution agent, validation (27/27 E2E, 16/16 unitaires) et drift check
+**Impact** : SPEC-004 → statut `done` ; Auth Shell prêt, périmètre d'authentification frontend opérationnel
+
+### Fichiers produits (code)
+- `apps/web/auth.ts` — NextAuth v5 config : provider Credentials stub, JWT+session callbacks, `JWT_SECRET` check
+- `apps/web/middleware.ts` — Protection `/dashboard`, `/modules/:path*` + redirect `/login`→`/dashboard` si authentifié
+- `apps/web/app/api/auth/[...nextauth]/route.ts` — Handler Auth.js (GET + POST)
+- `apps/web/lib/schemas/auth.ts` — `loginSchema` + `registerSchema` (Zod 4)
+- `apps/web/lib/types/next-auth.d.ts` — Augmentation TypeScript : User/Session/JWT avec `role`
+- `apps/web/components/providers/session-provider.tsx` — Client wrapper `<SessionProvider>`
+- `apps/web/app/(auth)/layout.tsx` — Layout centré pour pages auth (sans sidebar)
+- `apps/web/app/(auth)/actions.ts` — Server action `loginAction` avec protection open-redirect
+- `apps/web/app/(auth)/login/page.tsx` — Page login Server Component (Next.js 15 async searchParams)
+- `apps/web/app/(auth)/login/login-form.tsx` — Form client : Zod, useActionState, aria-invalid, role=alert
+- `apps/web/app/(auth)/register/page.tsx` — Page stub avec message accessible (role=alert, aria-live=polite)
+- `apps/web/app/(learner)/layout.tsx` — Layout learner avec AppShell (extrait du root layout)
+- `apps/web/e2e/auth.spec.ts` — 15 tests Playwright SPEC-004
+- `apps/web/e2e/global.setup.ts` — Setup auth state Playwright (login + storageState)
+- `apps/web/lib/__tests__/auth-schemas.test.ts` — 16 tests Vitest schémas Zod
+
+### Fichiers modifiés
+- `apps/web/app/layout.tsx` — AppShell → AuthSessionProvider (layout refactor)
+- `apps/web/playwright.config.ts` — Projets setup + storageState auth
+- `.env.example` — Ajout `AUTH_URL`, `AUTH_TRUST_HOST`, `NEXTAUTH_URL`
+- `apps/web/.gitignore` — Ajout `e2e/.auth`
+- `apps/web/package.json` + `pnpm-lock.yaml` — Ajout `next-auth@5.0.0-beta.31`
+
+### Métriques
+- Tests E2E Playwright : **27/27** PASS (15 auth SPEC-004 + 12 navigation SPEC-003 — aucune régression)
+- Tests unitaires Vitest : **16/16** PASS
+- Bundle JS login first load : **185 kB** (< 200 kB RGESN ✅)
+- Middleware bundle : **155 kB** (Edge Runtime)
+
+### Drifts documentés (intentionnels)
+- **Drift A** — Middleware `auth((req) => {...})` au lieu de `export { auth as middleware }` — pattern plus complet
+- **Drift B** — Page `/register` stub pur sans formulaire — formulaire non pertinent sans backend
+- **Drift C** — `AUTH_URL` + `AUTH_TRUST_HOST` requis par Auth.js v5 beta — ajoutés au `.env.example`
+- **Drift D** — Layout refactor : AppShell déplacé de root layout → `(learner)/layout.tsx`
+
+### Artefacts AIAD mis à jour
+- `specs/SPEC-004-auth-shell.md` → statut `done`, critères cochés, Interface §4 corrigée, §8 Notes de Drift
+- `specs/_index.md` → statut mis à jour
+- `AGENT-GUIDE.md` → 3 Human Learnings ajoutés
+- `CHANGELOG-ARTEFACTS.md` (cette entrée)
+
 ## 2026-04-27 — SPEC-003 — Drift Check + Drift Lock
 
 **Auteur** : Steeve Evers (PE) via Claude Code
