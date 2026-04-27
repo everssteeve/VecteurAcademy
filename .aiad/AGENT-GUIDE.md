@@ -30,7 +30,18 @@
 
 ## STACK TECHNIQUE (Référence Rapide)
 
-[Résumé de la stack — 10 lignes max. Reprend les éléments clés de ARCHITECTURE.md.]
+| Couche | Technologie | Notes |
+|--------|------------|-------|
+| Frontend | Next.js 15 (App Router) + React 19 + TypeScript strict | Server Components par défaut |
+| Style | Tailwind CSS v4 | Pas de runtime CSS, dark mode via `prefers-color-scheme` |
+| Linter | Biome 1.9 | Remplace ESLint + Prettier — `pnpm lint` |
+| Package manager | pnpm (workspace monorepo) | `pnpm --filter web <cmd>` pour le frontend |
+| Auth | Auth.js v5 (`next-auth@beta`) | JWT signé `JWT_SECRET` partagé avec FastAPI |
+| Backend | FastAPI + Python 3.12 + uv | `apps/api/` — async natif |
+| DB | PostgreSQL 16 + pgvector | ORM : SQLAlchemy 2 + Alembic (migrations versionnées) |
+| Contenu | MDX 3 dans `apps/web/content/modules/` | Fichier = module, frontmatter validé par Zod |
+| Tests frontend | Vitest (unitaires) + Playwright (E2E) | `pnpm test` / `pnpm e2e` |
+| Tests backend | pytest + httpx | `uv run pytest` dans `apps/api/` |
 
 ---
 
@@ -42,6 +53,7 @@
 - Ajouter un test pour chaque bug fix
 - Vérifier le Human Authorship avant toute automatisation
 - Mettre à jour les Lessons Learned en fin d'itération
+- Multiplier les estimations Context Budget par ×1.7 en phase Gate (le réel dépasse systématiquement l'estimé)
 
 ### JAMAIS
 - Committer sans lint passing
@@ -49,22 +61,91 @@
 - Pusher des secrets dans git
 - Merger sans code review (minimum 1 approval)
 - Livrer sans mettre à jour la SPEC correspondante
+- Mentionner jest-axe dans un DoOD si ce n'est pas dans les deps — écrire "assertions d'accessibilité Playwright (`getByRole`, `toHaveAttribute`, `aria-*`)"
 
 ---
 
 ## CONVENTIONS DE CODE
 
 ### Nommage
-[Exemples concrets selon la stack du projet]
+
+| Élément | Convention | Exemple |
+|---------|-----------|---------|
+| Composants React | PascalCase | `AppShell`, `LoginForm`, `MobileNav` |
+| Fichiers composants | kebab-case | `app-shell.tsx`, `login-form.tsx`, `mobile-nav.tsx` |
+| Fonctions utilitaires | camelCase | `getAllModules()`, `getModuleBySlug()` |
+| Server actions | camelCase suffixe `Action` | `loginAction()` |
+| Schémas Zod | camelCase suffixe `Schema` | `loginSchema`, `registerSchema` |
+| Route groups Next.js | parenthèses | `(auth)/`, `(learner)/` |
+| Variables d'env | SCREAMING_SNAKE_CASE | `JWT_SECRET`, `AUTH_URL` |
+| Imports Node.js | protocole `node:` obligatoire | `import path from "node:path"` |
 
 ### Structure des composants
+
+**Server Component (données + rendu) :**
+```tsx
+// apps/web/app/(learner)/layout.tsx
+import { getAllModules } from "@/lib/module-registry"
+import { AppShell } from "@/components/layout/app-shell"
+
+export default async function LearnerLayout({ children }: { children: React.ReactNode }) {
+  const modules = await getAllModules()
+  return <AppShell modules={modules}>{children}</AppShell>
+}
 ```
-[Template d'un composant standard]
+
+**Client Component (interactivité) :**
+```tsx
+// apps/web/components/layout/app-shell.tsx
+"use client"
+
+import type { ModuleMetadata } from "@formations-ia/shared-types"
+
+interface AppShellProps {
+  modules: ModuleMetadata[]
+  children: React.ReactNode
+}
+
+export function AppShell({ modules, children }: AppShellProps): React.JSX.Element {
+  // hooks ici (usePathname, useState, etc.)
+  return (/* JSX */)
+}
+```
+
+**Client Component avec Server Action (formulaires) :**
+```tsx
+// apps/web/app/(auth)/login/login-form.tsx
+"use client"
+
+export function LoginForm({ callbackUrl }: { callbackUrl: string }) {
+  const [serverState, formAction, isPending] = useActionState(loginAction, null)
+  // validation client Zod via onSubmit, server action via action={formAction}
+}
 ```
 
 ### Gestion des erreurs
+
+**Erreur attendue (retourner, ne pas lancer) :**
+```ts
+// apps/web/app/(auth)/actions.ts
+try {
+  await signIn("credentials", { ... })
+} catch (error) {
+  if (error instanceof AuthError) {
+    return { error: "Identifiants invalides." }  // retour de données, pas throw
+  }
+  throw error  // NEXT_REDIRECT et erreurs inattendues : toujours re-lancer
+}
 ```
-[Pattern standard de gestion d'erreur]
+
+**Erreur de parsing/IO (dégradation gracieuse) :**
+```ts
+// apps/web/lib/module-registry.ts
+try {
+  entries = await readdir(MODULES_DIR)
+} catch {
+  return []  // dossier absent → liste vide, pas d'exception
+}
 ```
 
 ---
@@ -73,17 +154,79 @@
 
 | Terme métier | Définition | Terme à éviter |
 |--------------|------------|----------------|
-| [Terme 1] | [Définition] | [Terme incorrect] |
+| Module | Unité de contenu autonome (fichier MDX + frontmatter validé) correspondant à un thème de formation | Cours, leçon, chapitre |
+| Apprenant | Utilisateur consultant ESN en formation (rôle `learner`) | Élève, étudiant, utilisateur |
+| Formateur | Rôle administrateur capable de créer/modifier des modules (rôle `instructor`) — non implémenté en itération 1 | Admin, auteur |
+| Slug | Identifiant URL d'un module (`"ai-engineering"`) — dérivé du frontmatter, pas du nom de fichier | ID, code, nom |
+| Progression | Avancement d'un apprenant sur un module (0–100 %) — persisté en DB, calculé côté serveur | Score, avancement, statut |
+| Quiz | Évaluation interactive intégrée à un module MDX — pas une page séparée | Test, examen, QCM |
+| Registry | Service (`module-registry.ts`) qui découvre et valide les modules depuis le filesystem | Store, catalogue, liste |
+| Shell | Layout applicatif (navigation + zone contenu) — ex: Auth Shell, Navigation Shell | Wrapper, container, frame |
 
 ---
 
 ## PATTERNS DE DÉVELOPPEMENT
 
-### Pattern 1 — [Nom]
-[Description + exemple de code]
+### Pattern 1 — Server Component avec fetch de données
 
-### Pattern 2 — [Nom]
-[Description + exemple de code]
+Les pages et layouts qui ont besoin de données sont des Server Components async. Ils appellent directement les fonctions du registry ou de la DB — pas de `useEffect`, pas de `fetch` client.
+
+```tsx
+// Page : données + rendu, pas de logique client
+export default async function DashboardPage() {
+  const modules = await getAllModules()
+  return <ModuleGrid modules={modules} />
+}
+
+// Layout : données partagées transmises via props, pas via Context
+export default async function LearnerLayout({ children }: { children: React.ReactNode }) {
+  const modules = await getAllModules()
+  return <AppShell modules={modules}>{children}</AppShell>
+}
+```
+
+### Pattern 2 — Server Action + useActionState (formulaires)
+
+Les formulaires mutants utilisent le tandem Server Action (validation serveur + effet) + `useActionState` (état UI). La validation Zod client se fait via `onSubmit` pour le feedback immédiat ; la Server Action est la source de vérité.
+
+```ts
+// actions.ts — "use server"
+export async function myAction(_prevState: State | null, formData: FormData): Promise<State | null> {
+  try {
+    await doSomething(formData)
+  } catch (error) {
+    if (error instanceof KnownError) return { error: "Message utilisateur" }
+    throw error  // re-lancer pour que Next.js gère NEXT_REDIRECT et erreurs fatales
+  }
+  return null
+}
+```
+
+```tsx
+// form.tsx — "use client"
+const [state, formAction, isPending] = useActionState(myAction, null)
+// aria-invalid + role="alert" sur les champs en erreur (RGAA)
+```
+
+### Pattern 3 — Playwright avec état d'authentification
+
+Les tests E2E qui testent des pages protégées réutilisent un `storageState` créé une seule fois par le projet `setup`. Ne jamais authentifier dans chaque test — c'est lent et fragile.
+
+```ts
+// global.setup.ts
+await page.fill('[name="email"]', "test@example.com")
+await page.fill('[name="password"]', "password123")
+await page.click('[type="submit"]')
+await page.context().storageState({ path: "e2e/.auth/user.json" })
+
+// playwright.config.ts
+projects: [
+  { name: "setup", testMatch: /global\.setup\.ts/ },
+  { name: "chromium", use: { storageState: "e2e/.auth/user.json" }, dependencies: ["setup"] },
+]
+```
+
+Filtrer toujours les `role="alert"` par texte : `page.getByRole("alert").filter({ hasText: "..." })` — Next.js injecte son propre `role="alert"` pour le routeur.
 
 ---
 
@@ -91,7 +234,11 @@
 
 | Anti-pattern | Pourquoi éviter | Alternative |
 |--------------|-----------------|-------------|
-| [Anti-pattern 1] | [Raison] | [Solution] |
+| `export { auth as middleware }` sans callback | Ne permet pas de gérer protect + redirect-from-login dans le même middleware | `export default auth((req) => { ... })` avec callback explicite |
+| `page.locator('[role="alert"]')` sans filtre | Next.js injecte `<div role="alert" id="__next-route-announcer__">` → strict mode Playwright explose | `page.getByRole("alert").filter({ hasText: "..." })` |
+| `import.meta.url` ou `__dirname` dans les fichiers Playwright | Les fichiers de config/setup Playwright ne s'exécutent pas en ESM pur → `exports is not defined` | Utiliser des chemins relatifs simples : `"e2e/.auth/user.json"` |
+| `getAllModules()` dans un Client Component | `fs/promises` n'est pas disponible côté client, l'appel échoue silencieusement ou lève une erreur | Appeler `getAllModules()` dans un Server Component parent et passer les données via props |
+| Server Action qui ne re-lance pas les erreurs inconnues | `NEXT_REDIRECT` (lancé par `redirect()`) est intercepté et traité comme une erreur applicative | Toujours `throw error` dans le `catch` après avoir géré les cas connus (`AuthError`, etc.) |
 
 ---
 
