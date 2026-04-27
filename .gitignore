@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+.uv/
+*.egg-info/
+dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+*.log
+.DS_Store
+Thumbs.db
+tsconfig.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+.docker/
+
+# Test artifacts
+coverage/
+.pytest_cache/
+htmlcov/

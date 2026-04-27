@@ -1,0 +1,47 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: formationsIA
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: ./apps/api
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./apps/api:/app
+    develop:
+      watch:
+        - action: sync
+          path: ./apps/api
+          target: /app
+
+  # langfuse:
+  #   image: langfuse/langfuse:latest
+  #   ports:
+  #     - "3001:3000"
+  #   environment:
+  #     DATABASE_URL: postgresql://postgres:postgres@db:5432/langfuse
+  #     NEXTAUTH_SECRET: changeme
+  #     SALT: changeme
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+
+volumes:
+  postgres_data:
