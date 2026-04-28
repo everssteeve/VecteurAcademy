@@ -1,5 +1,6 @@
 "use client"
 
+import { saveFinalQuizResultAction } from "@/app/(learner)/actions"
 import { getCertificationLevel } from "@formations-ia/shared-types"
 import type { CertificationLevel, QuizQuestion } from "@formations-ia/shared-types"
 import { useState } from "react"
@@ -91,6 +92,12 @@ export function FinalQuiz({ questions }: FinalQuizProps): React.JSX.Element {
         (acc, q, i) => acc + (nextAnswers[i] === q.correctAnswer ? 1 : 0),
         0
       )
+      const answersPayload = questions.map((q, i) => ({
+        question_id: q.id,
+        selected_option: nextAnswers[i] ?? "",
+        is_correct: nextAnswers[i] === q.correctAnswer,
+      }))
+      saveFinalQuizResultAction(totalScore, answersPayload).catch(() => {})
       setState({ status: "completed", totalScore, answers: nextAnswers })
     } else {
       setState({ status: "answering", currentQuestion: currentQuestion + 1, answers: nextAnswers })

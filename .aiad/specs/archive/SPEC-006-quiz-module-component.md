@@ -3,7 +3,7 @@
 **Intent parent** : INTENT-002
 **Auteur** : Steeve Evers
 **Date** : 2026-04-27
-**Statut** : ready
+**Statut** : done
 **SQS** : 4/5 ⚠️ (réserve : navigation clavier radio corrigée)
 
 ---
@@ -168,15 +168,21 @@ Budget très sous le seuil. Session unique courte.
 
 ## 7. Definition of Output Done (DoOD)
 
-- [ ] `packages/shared-types/src/quiz.ts` créé avec `QuizQuestion`
-- [ ] `packages/shared-types/index.ts` exporte `QuizQuestion`
-- [ ] `components/quiz/quiz.tsx` implémenté (`"use client"`, state machine 2 états)
-- [ ] `components/mdx/mdx-components.tsx` contient `Quiz` dans le map de composants
-- [ ] 6 fichiers MDX : placeholder remplacé par `<Quiz questions={[...]} />` avec données réelles
-- [ ] Tests Vitest : calcul du score (0/5, 3/5, 5/5), état disabled sur bouton sans sélection
-- [ ] `pnpm lint` passing
-- [ ] `pnpm typecheck --filter web` passing
-- [ ] `pnpm test --filter web` passing
-- [ ] SPEC mise à jour si écart durant l'implémentation (Drift Lock)
-- [ ] Gouvernance RGAA vérifiée : `fieldset`+`legend` par question, `role="status"` sur le score, navigation clavier radio native (Tab pour entrer, Flèches ↑↓ entre options, Tab vers bouton), assertions d'accessibilité Playwright (`getByRole`, `toHaveAttribute`, `aria-*`)
-- [ ] Gouvernance RGESN vérifiée : aucune dépendance externe ajoutée — composant React pur
+- [x] `packages/shared-types/src/quiz.ts` créé avec `QuizQuestion`
+- [x] `packages/shared-types/index.ts` exporte `QuizQuestion`
+- [x] `components/quiz/quiz.tsx` implémenté (`"use client"`, state machine 2 états)
+- [x] `components/mdx/mdx-components.tsx` contient `Quiz` dans le map de composants
+- [x] 6 fichiers MDX : placeholder remplacé par `<Quiz questions={[...]} />` avec données réelles
+- [x] Tests Vitest : calcul du score (0/5, 3/5, 5/5), état disabled sur bouton sans sélection — 21/21
+- [x] `pnpm lint` passing
+- [x] `pnpm typecheck --filter web` passing
+- [x] `pnpm test --filter web` passing
+- [x] SPEC mise à jour si écart durant l'implémentation (Drift Lock)
+- [x] Gouvernance RGAA vérifiée : `fieldset`+`legend` par question, `<output aria-live="polite">` sur le score, navigation clavier radio native (Tab pour entrer, Flèches ↑↓ entre options, Tab vers bouton), assertions d'accessibilité Playwright (`getByRole`, `toHaveAttribute`, `aria-*`)
+- [x] Gouvernance RGESN vérifiée : aucune dépendance externe ajoutée — composant React pur
+
+---
+
+## 8. Notes de Drift Lock (2026-04-28)
+
+**Statut** : aucun drift — implémentation conforme à la SPEC

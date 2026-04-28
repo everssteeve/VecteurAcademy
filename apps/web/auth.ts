@@ -20,18 +20,36 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials)
         if (!parsed.success) return null
-        // Stub: validation format only — backend auth implemented in future SPEC (auth backend)
-        return { id: "stub-id", email: parsed.data.email, role: "learner" }
+
+        try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: parsed.data.email, password: parsed.data.password }),
+            cache: "no-store",
+          })
+
+          if (!res.ok) return null
+
+          const user = await res.json()
+          return { id: user.id, email: user.email, role: user.role, esn_name: user.esn_name }
+        } catch {
+          return null
+        }
       },
     }),
   ],
   callbacks: {
     jwt({ token, user }) {
-      if (user) token.role = (user as { role: string }).role
+      if (user) {
+        token.role = user.role
+        token.esn_name = (user as { esn_name: string }).esn_name
+      }
       return token
     },
     session({ session, token }) {
       session.user.role = token.role as string
+      session.user.esn_name = token.esn_name as string
       return session
     },
   },

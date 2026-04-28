@@ -9,13 +9,14 @@ dependencies = [
     "sqlalchemy>=2.0",
     "alembic>=1.13",
     "asyncpg>=0.29",
-    "pydantic>=2.0",
+    "pydantic[email]>=2.0",
     "pydantic-settings>=2.0",
     "python-jose[cryptography]>=3.3",
     "bcrypt>=4.1",
     "slowapi>=0.1",
     "litellm>=1.40",
     "langfuse>=2.0",
+    "greenlet>=3.4.0",
 ]
 
 [dependency-groups]
@@ -28,6 +29,10 @@ dev = [
 
 [tool.uv]
 package = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = ["."]
 
 [tool.ruff]
 line-length = 88

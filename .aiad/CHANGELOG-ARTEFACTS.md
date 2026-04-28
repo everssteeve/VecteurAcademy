@@ -17,6 +17,117 @@
 
 <!-- Ajoutez vos entrées ci-dessous, les plus récentes en haut -->
 
+## 2026-04-28 — SPEC-010 — Drift Lock ✅ (statut `done`) + INTENT-003 → `livré`
+
+**Auteur** : Steeve Evers (PE) via Claude Code (`/sdd-exec` + `/sdd-validate` + `/sdd-drift-check`)
+**Raison** : Clôture SPEC-010 — Protection routes + persistance progression et quiz
+**Impact** : SPEC-010 → `done` ; INTENT-003 → `livré` (toutes les SPECs 008/009/010 livrées)
+
+### Résultats validation
+
+- Ruff (Python) : ✅ PASS
+- TSC (TypeScript) : ✅ PASS
+- Biome (lint) : ✅ PASS — 49 fichiers
+- Pytest : ✅ 16/16 (10 existants + 6 nouveaux progress)
+- Next.js Build : ✅ PASS
+- Drift : ✅ AUCUN — implémentation conforme à la SPEC
+
+### Fichiers créés (code)
+
+- `apps/api/routers/progress.py` — 3 endpoints : GET /progress, POST /progress/module, POST /quiz/result
+- `apps/api/services/progress_service.py` — logique métier (get_progress, track_module_start, save_quiz_result)
+- `apps/api/schemas/progress.py` — ModuleStartRequest, QuizResultWithUser, ProgressRead
+- `apps/api/tests/test_progress.py` — 6 tests pytest (dont isolation RGPD cross-user)
+- `apps/web/app/(learner)/actions.ts` — 3 Server Actions (markModuleStarted, saveModuleQuizResult, saveFinalQuizResult)
+- `apps/web/components/tracking/mark-module-started.tsx` — Client Component fire-and-forget
+
+### Fichiers modifiés (code)
+
+- `apps/api/main.py` — progress router inclus
+- `apps/web/middleware.ts` — `/evaluation-finale` ajouté à `isProtected` + `matcher`
+- `apps/web/app/(learner)/dashboard/page.tsx` — fetch progression réelle + statuts dynamiques
+- `apps/web/app/(learner)/modules/[slug]/page.tsx` — `<MarkModuleStarted moduleId={slug} />`
+- `apps/web/components/quiz/quiz.tsx` — passe `moduleId` à QuizInteractive
+- `apps/web/components/quiz/quiz-interactive.tsx` — prop `moduleId?` + save action on complete
+- `apps/web/components/quiz/final-quiz.tsx` — save action on complete
+
+### Drifts documentés (intentionnels)
+
+- **Drift A** — `apps/api/tests/test_progress.py` ajouté (non listé dans §4 de la SPEC) — amélioration couverture + test RGPD isolation cross-user
+- **Drift B** — `max_score: 18` hardcodé dans `saveFinalQuizResultAction` — prescrit explicitement par la SPEC, signalé comme dette technique si le quiz final évolue
+
+### Réserve architecturale (Human Learning)
+
+- `GET /progress` non authentifié côté FastAPI — auth déléguée à Auth.js/Next.js (pattern intentionnel en monorepo privé). Avant exposition publique : ajouter shared secret inter-service. Documenté dans AGENT-GUIDE.
+
+### Artefacts AIAD mis à jour
+
+- `specs/SPEC-010-route-protection-progression.md` → statut `done`, DoOD coché, Drift Lock documenté
+- `specs/_index.md` → SPEC-010 `done`
+- `intents/INTENT-003-auth-user-management.md` → statut `livré`
+- `intents/_index.md` → INTENT-003 `livré`
+- `AGENT-GUIDE.md` → Human Learning RGPD inter-service auth ajouté
+- `CHANGELOG-ARTEFACTS.md` (cette entrée)
+
+---
+
+## 2026-04-28 — Rétrospective INTENT-002 — Clôture itération 2
+
+**Auteur** : Steeve Evers (PE) via Claude Code (`/aiad-retro`)
+**Raison** : Rétrospective de fin d'itération INTENT-002 — alimentation AGENT-GUIDE + ALIS
+**Impact** : Lessons Learned + ALIS-003 ajoutés ; SPEC-005/006/007 archivées ; SPEC-006 frontmatter corrigé
+
+### Métriques d'itération
+
+| Métrique | Valeur | Tendance |
+|----------|--------|----------|
+| SPECs livrées | 3 (SPEC-005/006/007) | |
+| Taux premier passage (mesuré) | non mesurable | ↓ vs iter. 1 (signal : corrections non tracées) |
+| Drifts détectés | 5 intentionnels | stables |
+| SQS moyen | 4,3/5 | ↑ vs iter. 1 (4/5) |
+| Lessons Learned ajoutés | 1 | |
+| Human Learnings ajoutés | 0 | |
+| Signaux ALIS ajoutés | 1 (ALIS-003) | |
+
+### Lessons Learned ajoutés (AGENT-GUIDE.md)
+
+- **2026-04-28** — Corrections agent non commitées atomiquement sur SPEC-005/006/007 → taux premier passage réel non mesurable. Règle : chaque correction = commit atomique avec ref SPEC.
+
+### Signaux ALIS
+
+- **ALIS-003** (majeur) — Persistance des logs d'échanges des commandes AIAD rituelles : les décisions prises en rétro, gate, drift-check ne sont pas tracées. Action : créer `.aiad/logs/` + modifier les skills rituels.
+
+### Actions pour l'itération suivante
+
+1. **PE** — Commiter chaque correction agent atomiquement avec référence SPEC dès la prochaine session. Vérifiable : taux premier passage calculable à la prochaine rétro.
+2. **Framework (ALIS-003)** — Concevoir et implémenter le mécanisme de logs rituels `.aiad/logs/`. Vérifiable : fichier log créé après chaque invocation de commande AIAD rituelle.
+
+### Artefacts AIAD mis à jour
+
+- `specs/SPEC-006-quiz-module-component.md` → frontmatter `ready` → `done`, DoOD coché, §8 Drift Lock ajouté
+- `specs/_index.md` → liens 005/006/007 mis à jour vers `archive/`
+- `specs/archive/` → SPEC-005, SPEC-006, SPEC-007 archivées
+- `AGENT-GUIDE.md` → Lessons Learned 2026-04-28 ajouté
+- `ALIS.md` → ALIS-003 ajouté
+- `CHANGELOG-ARTEFACTS.md` (cette entrée)
+
+---
+
+## 2026-04-28 — INTENT-001 + INTENT-002 — Archivage
+
+**Auteur** : Steeve Evers (PE) via Claude Code
+**Raison** : Les deux intents sont au statut `livré` — toutes leurs SPECs liées sont `done`. Archivage dans `intents/archive/` conformément au cycle SDD.
+**Impact** : INTENT-001 + INTENT-002 → statut `archivé` ; `intents/_index.md` mis à jour ; ALIS-001 créé (anomalie : archivage non automatisé lors du passage `livré`)
+
+### Artefacts AIAD mis à jour
+
+- `intents/INTENT-001-skeleton-navigation-modulaire.md` → déplacé dans `intents/archive/`, statut `archivé`
+- `intents/INTENT-002-contenu-modules-quiz.md` → déplacé dans `intents/archive/`, statut `archivé`
+- `intents/_index.md` → statuts mis à jour (`livré` → `archivé`)
+- `ALIS.md` → créé (nouveau fichier de suivi des anomalies du cycle SDD), entrée ALIS-001 ajoutée
+
+---
+
 ## 2026-04-28 — SPEC-007 — Drift Lock ✅ (statut `done`) + INTENT-002 → `livré`
 
 **Auteur** : Steeve Evers (PE) via Claude Code

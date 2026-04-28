@@ -7,6 +7,7 @@ export const loginSchema = z.object({
 
 export const registerSchema = loginSchema
   .extend({
+    esn_name: z.string().min(2, "Le nom de l'ESN doit contenir au moins 2 caractères"),
     confirmPassword: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères"),
   })
   .refine((d) => d.password === d.confirmPassword, {

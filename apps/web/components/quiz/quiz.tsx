@@ -7,5 +7,5 @@ interface QuizProps {
 
 export function Quiz({ moduleId }: QuizProps): React.JSX.Element {
   const questions = quizData[moduleId] ?? []
-  return <QuizInteractive questions={questions} />
+  return <QuizInteractive questions={questions} moduleId={moduleId} />
 }

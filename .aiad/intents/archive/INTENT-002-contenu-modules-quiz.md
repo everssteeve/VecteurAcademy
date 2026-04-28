@@ -3,14 +3,14 @@ id: INTENT-002
 name: Contenu modules + quiz de fin de parcours
 description: Peupler les 6 modules MDX avec le contenu formationIA.md, ajouter les quiz de fin de module, et créer un quiz de fin de parcours complet.
 type: project
-status: livré
+status: archivé
 ---
 
 # INTENT-002 — Contenu modules + quiz de fin de parcours
 
 **Auteur** : Steeve Evers
 **Date** : 2026-04-27
-**Statut** : validé
+**Statut** : archivé
 
 ---
 
@@ -47,6 +47,6 @@ L'implémentation a dérivé si :
 
 ## SPECs liées
 
-- [x] SPEC-005 — Contenu MDX + Rendu modules (source : `formationIA.md`) → draft
-- [x] SPEC-006 — Composant Quiz de fin de module (MDX interactif) → draft
-- [x] SPEC-007 — Quiz de fin de parcours complet (nouvelle feature) → draft
+- [x] SPEC-005 — Contenu MDX + Rendu modules (source : `formationIA.md`) → done
+- [x] SPEC-006 — Composant Quiz de fin de module (MDX interactif) → done
+- [x] SPEC-007 — Quiz de fin de parcours complet (nouvelle feature) → done

@@ -2,6 +2,7 @@ import { MDXRemote } from "next-mdx-remote/rsc"
 import { notFound } from "next/navigation"
 import { Breadcrumb } from "../../../../components/layout/breadcrumb"
 import { mdxComponents } from "../../../../components/mdx/mdx-components"
+import { MarkModuleStarted } from "../../../../components/tracking/mark-module-started"
 import { getAllModules, getModuleBySlug } from "../../../../lib/module-registry"
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
@@ -65,6 +66,8 @@ export default async function ModulePage({
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">{module.title}</h1>
         <p className="text-lg text-gray-600 dark:text-gray-300">{module.description}</p>
       </div>
+
+      <MarkModuleStarted moduleId={slug} />
 
       <article className="prose prose-gray dark:prose-invert max-w-none mb-8">
         <MDXRemote source={module.rawContent} components={mdxComponents} />

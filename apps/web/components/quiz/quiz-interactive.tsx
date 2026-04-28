@@ -1,5 +1,6 @@
 "use client"
 
+import { saveModuleQuizResultAction } from "@/app/(learner)/actions"
 import type { QuizQuestion } from "@formations-ia/shared-types"
 import { useState } from "react"
 
@@ -9,9 +10,10 @@ type QuizState =
 
 interface QuizInteractiveProps {
   questions: QuizQuestion[]
+  moduleId?: string
 }
 
-export function QuizInteractive({ questions }: QuizInteractiveProps): React.JSX.Element {
+export function QuizInteractive({ questions, moduleId }: QuizInteractiveProps): React.JSX.Element {
   const [state, setState] = useState<QuizState>({
     status: "answering",
     currentQuestion: 0,
@@ -52,6 +54,16 @@ export function QuizInteractive({ questions }: QuizInteractiveProps): React.JSX.
         (acc, q, i) => acc + (nextAnswers[i] === q.correctAnswer ? 1 : 0),
         0
       )
+      if (moduleId) {
+        const answersPayload = questions.map((q, i) => ({
+          question_id: q.id,
+          selected_option: nextAnswers[i] ?? "",
+          is_correct: nextAnswers[i] === q.correctAnswer,
+        }))
+        saveModuleQuizResultAction(moduleId, score, questions.length, answersPayload).catch(
+          () => {}
+        )
+      }
       setState({ status: "completed", score, answers: nextAnswers })
     } else {
       setState({ status: "answering", currentQuestion: currentQuestion + 1, answers })
