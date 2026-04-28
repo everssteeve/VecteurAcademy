@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test"
 
-test.describe("Auth Shell — SPEC-004", () => {
+const E2E_EMAIL = "e2e@vecteuracademy.fr"
+const E2E_PASSWORD = "E2eTest1!"
+
+test.describe("Auth Shell — SPEC-004/009", () => {
   test.describe("redirect non-authentifié", () => {
     test.use({ storageState: { cookies: [], origins: [] } })
 
@@ -11,6 +14,11 @@ test.describe("Auth Shell — SPEC-004", () => {
 
     test("accès /modules/:slug sans session → redirigé vers /login", async ({ page }) => {
       await page.goto("/modules/ai-engineering")
+      await expect(page).toHaveURL(/\/login/)
+    })
+
+    test("accès /evaluation-finale sans session → redirigé vers /login", async ({ page }) => {
+      await page.goto("/evaluation-finale")
       await expect(page).toHaveURL(/\/login/)
     })
 
@@ -60,17 +68,22 @@ test.describe("Auth Shell — SPEC-004", () => {
       await page.getByRole("button", { name: "Se connecter" }).click()
       await expect(page.locator('input[name="email"]')).toHaveAttribute("aria-invalid", "true")
     })
-  })
 
-  test.describe("connexion stub", () => {
-    test.use({ storageState: { cookies: [], origins: [] } })
+    test("credentials invalides → message d'erreur visible", async ({ page }) => {
+      await page.goto("/login")
+      await page.fill('input[name="email"]', "inexistant@example.com")
+      await page.fill('input[name="password"]', "WrongPassword1!")
+      await page.getByRole("button", { name: "Se connecter" }).click()
+      const alert = page.getByRole("alert").filter({ hasText: /identifiants|invalide/i })
+      await expect(alert).toBeVisible()
+    })
 
     test("connexion avec credentials valides → session créée, redirection /dashboard", async ({
       page,
     }) => {
       await page.goto("/login")
-      await page.fill('input[name="email"]', "user@example.com")
-      await page.fill('input[name="password"]', "password123")
+      await page.fill('input[name="email"]', E2E_EMAIL)
+      await page.fill('input[name="password"]', E2E_PASSWORD)
       await page.getByRole("button", { name: "Se connecter" }).click()
       await expect(page).toHaveURL("/dashboard")
     })
@@ -90,7 +103,7 @@ test.describe("Auth Shell — SPEC-004", () => {
     })
   })
 
-  test.describe("page /register (stub)", () => {
+  test.describe("page /register", () => {
     test.use({ storageState: { cookies: [], origins: [] } })
 
     test("page /register accessible sans session", async ({ page }) => {
@@ -98,16 +111,22 @@ test.describe("Auth Shell — SPEC-004", () => {
       await expect(page.locator("h1")).toHaveText("Créer un compte")
     })
 
-    test("message stub visible sur la page /register", async ({ page }) => {
+    test("formulaire /register contient les 4 champs requis", async ({ page }) => {
       await page.goto("/register")
-      await expect(
-        page.getByText("Inscription temporairement indisponible — fonctionnalité à venir")
-      ).toBeVisible()
+      await expect(page.locator('input[name="email"]')).toBeVisible()
+      await expect(page.locator('input[name="esn_name"]')).toBeVisible()
+      await expect(page.locator('input[name="password"]')).toBeVisible()
+      await expect(page.locator('input[name="confirmPassword"]')).toBeVisible()
     })
 
-    test("message stub a role=alert", async ({ page }) => {
+    test("erreur si email déjà utilisé → message 409 visible", async ({ page }) => {
       await page.goto("/register")
-      const alert = page.getByRole("alert").filter({ hasText: "temporairement indisponible" })
+      await page.fill('input[name="email"]', E2E_EMAIL)
+      await page.fill('input[name="esn_name"]', "TestESN")
+      await page.fill('input[name="password"]', E2E_PASSWORD)
+      await page.fill('input[name="confirmPassword"]', E2E_PASSWORD)
+      await page.getByRole("button", { name: /créer|s'inscrire/i }).click()
+      const alert = page.getByRole("alert").filter({ hasText: /déjà utilisée/i })
       await expect(alert).toBeVisible()
     })
   })
