@@ -1,8 +1,12 @@
 "use server"
 
-import { signIn } from "@/auth"
+import { signIn, signOut } from "@/auth"
 import { registerSchema } from "@/lib/schemas/auth"
 import { AuthError } from "next-auth"
+
+export async function logoutAction(): Promise<void> {
+  await signOut({ redirectTo: "/login" })
+}
 
 export async function loginAction(
   _prevState: { error: string } | null,

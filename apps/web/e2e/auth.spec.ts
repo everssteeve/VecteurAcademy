@@ -103,6 +103,36 @@ test.describe("Auth Shell — SPEC-004/009", () => {
     })
   })
 
+  test.describe.configure({ mode: "serial" })
+
+  test.describe("logout — SPEC-012", () => {
+    test("bouton 'Se déconnecter' visible dans la Sidebar (desktop)", async ({ page }) => {
+      await page.goto("/dashboard")
+      await expect(page.getByRole("button", { name: "Se déconnecter" })).toBeVisible()
+    })
+
+    test("clic 'Se déconnecter' → session détruite + redirection /login", async ({ page }) => {
+      await page.goto("/dashboard")
+      await page.getByRole("button", { name: "Se déconnecter" }).click()
+      await expect(page).toHaveURL(/\/login/)
+    })
+
+    test("après déconnexion, GET /dashboard → redirigé vers /login", async ({ page }) => {
+      await page.goto("/dashboard")
+      await page.getByRole("button", { name: "Se déconnecter" }).click()
+      await expect(page).toHaveURL(/\/login/)
+      await page.goto("/dashboard")
+      await expect(page).toHaveURL(/\/login/)
+    })
+
+    test("bouton 'Se déconnecter' focusable au clavier", async ({ page }) => {
+      await page.goto("/dashboard")
+      const button = page.getByRole("button", { name: "Se déconnecter" })
+      await button.focus()
+      await expect(button).toBeFocused()
+    })
+  })
+
   test.describe("page /register", () => {
     test.use({ storageState: { cookies: [], origins: [] } })
 

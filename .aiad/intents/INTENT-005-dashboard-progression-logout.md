@@ -35,5 +35,5 @@ Un module ajouté après ce développement n'apparaît pas dans le dashboard (ou
 
 ## SPECs liées
 
-- [ ] SPEC-012 — Bouton logout (déconnexion Auth.js v5)
+- [x] [SPEC-012](../specs/SPEC-012-logout-button.md) — Bouton logout (déconnexion Auth.js v5)
 - [ ] SPEC-013 — Dashboard de progression (quiz par module + tentatives évaluation finale)

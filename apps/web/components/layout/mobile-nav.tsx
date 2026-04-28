@@ -1,5 +1,6 @@
 "use client"
 
+import { LogoutButton } from "@/components/auth/logout-button"
 import type { ModuleMetadata } from "@formations-ia/shared-types"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
@@ -136,6 +137,9 @@ export function MobileNav({ modules, currentPath }: MobileNavProps): React.JSX.E
               </span>
               <span>Évaluation finale</span>
             </Link>
+          </div>
+          <div className="border-t border-gray-200 dark:border-gray-800 pt-3">
+            <LogoutButton />
           </div>
         </nav>
       </div>

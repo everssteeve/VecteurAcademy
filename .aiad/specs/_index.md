@@ -17,6 +17,7 @@
 | [SPEC-009](archive/SPEC-009-auth-credentials-provider.md) | Auth.js credentials + endpoints FastAPI register/login | INTENT-003 | 4/5 ⚠️ | archived | — |
 | [SPEC-010](archive/SPEC-010-route-protection-progression.md) | Protection routes + persistance progression et quiz | INTENT-003 | 4/5 ⚠️ | archived | — |
 | [SPEC-011](archive/SPEC-011-instructor-badge.md) | InstructorBadge component + migration MDX (24 marqueurs) | INTENT-004 | 4/5 ⚠️ | archived | — |
+| [SPEC-012](SPEC-012-logout-button.md) | Bouton logout (déconnexion Auth.js v5) | INTENT-005 | 5/5 ✅ | done | commit SPEC-012 |
 
 ## Statuts possibles
 

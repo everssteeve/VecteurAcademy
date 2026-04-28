@@ -1,3 +1,4 @@
+import { LogoutButton } from "@/components/auth/logout-button"
 import type { ModuleMetadata } from "@formations-ia/shared-types"
 import Link from "next/link"
 
@@ -73,6 +74,9 @@ export function Sidebar({ modules, currentPath }: SidebarProps): React.JSX.Eleme
           </Link>
         </div>
       </nav>
+      <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+        <LogoutButton />
+      </div>
     </aside>
   )
 }

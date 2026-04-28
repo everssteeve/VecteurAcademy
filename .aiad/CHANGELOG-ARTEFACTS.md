@@ -17,6 +17,49 @@
 
 <!-- Ajoutez vos entrées ci-dessous, les plus récentes en haut -->
 
+## 2026-04-28 — SPEC-012 — Drift Lock ✅ (statut `done`)
+
+**Auteur** : Steeve Evers (PE) via Claude Code (`/sdd-validate` + `/sdd-drift-check`)
+**Raison** : Clôture SPEC-012 — Bouton logout (déconnexion Auth.js v5)
+**Impact** : SPEC-012 → `done` ; INTENT-005 SPEC-012 cochée (SPEC-013 restante)
+
+### Résultats validation
+
+- Biome (lint) : ✅ PASS — 51 fichiers, 2 imports réordonnés automatiquement
+- TypeScript / Build Next.js : ✅ PASS — compilation sans erreur
+- Playwright E2E : ✅ 21/21 (4 nouveaux tests SPEC-012 + 17 sans régression)
+
+### Fichiers créés (code)
+
+- `apps/web/components/auth/logout-button.tsx` — composant Client `LogoutButton` avec `<form action={logoutAction}>`
+
+### Fichiers modifiés (code — périmètre SPEC-012)
+
+- `apps/web/app/(auth)/actions.ts` — ajout `logoutAction` + import `signOut`
+- `apps/web/components/layout/sidebar.tsx` — intégration `LogoutButton` en bas de la sidebar desktop
+- `apps/web/components/layout/mobile-nav.tsx` — intégration `LogoutButton` en bas du panneau mobile
+- `apps/web/e2e/auth.spec.ts` — 4 tests logout SPEC-012 + `test.describe.configure({ mode: "serial" })`
+
+### Fichiers modifiés (hors périmètre — bugfix découvert à l'exécution)
+
+- `apps/web/auth.ts` — correctif `session.user.id = token.sub as string` (Auth.js v5 beta.31 ne propage pas automatiquement l'id)
+- `apps/web/lib/types/next-auth.d.ts` — ajout `id: string` dans `Session.user`
+
+### Drifts documentés
+
+- **Écart mineur** : commentaire `// signOut lance NEXT_REDIRECT` absent du code produit — non fonctionnel
+- **Ajout infra test** : `test.describe.configure({ mode: "serial" })` non prévu — justifié par flakiness Playwright en parallèle
+- **Hors périmètre** : bugfix `session.user.id` inclus dans la même PR — découverte opportuniste, correctif minimal
+
+### Artefacts AIAD mis à jour
+
+- `specs/SPEC-012-logout-button.md` → statut `done`, DoOD coché, §8 Notes de Drift Lock ajouté
+- `specs/_index.md` → statut `done`, PR référencée
+- `AGENT-GUIDE.md` → Lessons Learned : flakiness Playwright logout + bug `session.user.id` Auth.js v5
+- `CHANGELOG-ARTEFACTS.md` (cette entrée)
+
+---
+
 ## 2026-04-28 — SPEC-011 — Drift Lock ✅ (statut `done`) + INTENT-004 → `livré`
 
 **Auteur** : Steeve Evers (PE) via Claude Code (`/sdd-validate` + `/sdd-drift-check`)
