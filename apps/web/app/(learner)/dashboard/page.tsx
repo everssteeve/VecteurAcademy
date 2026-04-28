@@ -1,4 +1,5 @@
 import { auth } from "@/auth"
+import { getCertificationLevel } from "@formations-ia/shared-types"
 import { getAllModules } from "../../../lib/module-registry"
 
 export const metadata = {
@@ -15,6 +16,7 @@ interface QuizResultItem {
   module_id: string | null
   score: number
   max_score: number
+  answered_at: string
 }
 
 export default async function DashboardPage() {
@@ -45,11 +47,16 @@ export default async function DashboardPage() {
     if (!progress) return { label: "Non commencé" }
     if (progress.completed_at) {
       const result = quizResults.find((r) => r.quiz_type === "module" && r.module_id === slug)
-      const score = result ? `${result.score}/${result.max_score}` : undefined
-      return { label: "Terminé", score }
+      if (result) {
+        const pct = Math.round((result.score / result.max_score) * 100)
+        return { label: "Terminé", score: `${result.score}/${result.max_score} (${pct}%)` }
+      }
+      return { label: "Terminé" }
     }
     return { label: "En cours" }
   }
+
+  const finalAttempts = quizResults.filter((r) => r.quiz_type === "final")
 
   return (
     <div>
@@ -102,6 +109,45 @@ export default async function DashboardPage() {
           })}
         </ul>
       )}
+
+      <section aria-labelledby="final-quiz-heading" className="mt-10">
+        <h2
+          id="final-quiz-heading"
+          className="text-xl font-bold text-gray-900 dark:text-white mb-4"
+        >
+          Évaluation finale
+        </h2>
+        {finalAttempts.length === 0 ? (
+          <p className="text-gray-500 dark:text-gray-400">
+            Pas encore de tentative à l&apos;évaluation finale.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {finalAttempts.map((attempt) => {
+              const level = getCertificationLevel(attempt.score)
+              const date = new Date(attempt.answered_at).toLocaleDateString("fr-FR", {
+                dateStyle: "medium",
+              })
+              return (
+                <li
+                  key={attempt.answered_at}
+                  className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
+                >
+                  <span className="text-sm text-gray-500 dark:text-gray-400 min-w-[7rem]">
+                    {date}
+                  </span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {attempt.score}/{attempt.max_score}
+                  </span>
+                  <span className="text-sm">
+                    {level.emoji} {level.label}
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </section>
     </div>
   )
 }
