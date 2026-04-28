@@ -1,3 +1,4 @@
+import { Quiz } from "@/components/quiz/quiz"
 import type { ComponentPropsWithoutRef } from "react"
 
 type HeadingProps = ComponentPropsWithoutRef<"h1">
@@ -9,6 +10,7 @@ type CodeProps = ComponentPropsWithoutRef<"code">
 type PreProps = ComponentPropsWithoutRef<"pre">
 
 export const mdxComponents = {
+  Quiz,
   h1: ({ children, ...props }: HeadingProps) => (
     <h1 className="text-3xl font-bold mt-8 mb-4" {...props}>
       {children}

@@ -17,6 +17,45 @@
 
 <!-- Ajoutez vos entrées ci-dessous, les plus récentes en haut -->
 
+## 2026-04-28 — SPEC-006 — Drift Lock ✅ (statut `done`)
+
+**Auteur** : Steeve Evers (PE) via Claude Code
+**Raison** : Validation QA complète + Drift Lock SPEC-006
+**Impact** : SPEC-006 → statut `done` ; 21/21 tests vitest, lint clean, browser validated (Playwright)
+
+### Résultats validation
+
+- Lint (biome) : ✅ PASS
+- Typecheck (tsc) : ✅ PASS
+- Tests (vitest) : ✅ 21/21
+- Browser : Quiz Q1→Q5, résultats, restart — tous fonctionnels
+- RGAA : fieldset+legend, aria-live, `<output>`, `aria-label` — conforme
+- RGESN : zéro dépendance externe ajoutée
+
+---
+
+## 2026-04-28 — SPEC-006 — Exécution agent + statut `validation`
+
+**Auteur** : Steeve Evers (PE) via Claude Code
+**Raison** : Implémentation du composant Quiz de fin de module (INTENT-002)
+**Impact** : SPEC-006 → statut `validation` ; composant `<Quiz>` opérationnel dans les 6 modules MDX
+
+### Fichiers produits (code)
+
+- `packages/shared-types/src/quiz.ts` — Type `QuizQuestion` créé
+- `packages/shared-types/index.ts` — Export `QuizQuestion` ajouté
+- `apps/web/components/quiz/quiz.tsx` — Composant React client, state machine 2 états, RGAA conforme
+- `apps/web/components/quiz/__tests__/quiz.test.ts` — 5 tests Vitest (score 0/5, partiel, 5/5, disabled logic)
+- `apps/web/components/mdx/mdx-components.tsx` — `Quiz` enregistré dans le map MDX
+- `apps/web/content/modules/01-ai-engineering.mdx` — Placeholder remplacé par `<Quiz questions={[...]} />`
+- `apps/web/content/modules/02-foundation-models.mdx` — idem
+- `apps/web/content/modules/03-model-selection.mdx` — idem
+- `apps/web/content/modules/04-prompt-engineering.mdx` — idem
+- `apps/web/content/modules/05-rag-agents.mdx` — idem
+- `apps/web/content/modules/06-production-architecture.mdx` — idem
+
+---
+
 ## 2026-04-27 — SPEC-005 — Drift Check + Drift Lock
 
 **Auteur** : Steeve Evers (PE) via Claude Code
