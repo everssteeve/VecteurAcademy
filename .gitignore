@@ -39,3 +39,8 @@ tsconfig.tsbuildinfo
 coverage/
 .pytest_cache/
 htmlcov/
+apps/web/playwright-report/
+apps/web/test-results/
+
+# Claude Code local settings (machine-specific paths)
+.claude/settings.local.json
