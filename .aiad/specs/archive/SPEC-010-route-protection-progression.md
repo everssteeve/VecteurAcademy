@@ -3,7 +3,7 @@
 **Intent parent** : INTENT-003
 **Auteur** : Steeve Evers (PE)
 **Date** : 2026-04-28
-**Statut** : done
+**Statut** : archived
 **SQS** : 4/5 ⚠️ (réserve : snake_case JSONB unifié, variables final-quiz corrigées, status_code idempotent 200)
 **Drift Lock** : 2026-04-28 — implémentation conforme à la SPEC. Ajout non prévu : `apps/api/tests/test_progress.py` (6 tests pytest dont test isolation RGPD cross-user). `max_score: 18` hardcodé dans `saveFinalQuizResultAction` — prescrit par la SPEC, à paramétrer si le nombre de questions du quiz final évolue. Réserve architecturale documentée : `GET /progress` non protégé côté FastAPI (auth déléguée à Auth.js/Next.js) — risque RGPD moyen si l'API est exposée publiquement avant ajout d'un mécanisme inter-service.
 

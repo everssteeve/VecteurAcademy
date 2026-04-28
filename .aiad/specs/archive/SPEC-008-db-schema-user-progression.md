@@ -3,7 +3,8 @@
 **Intent parent** : INTENT-003
 **Auteur** : Steeve Evers (PE)
 **Date** : 2026-04-28
-**Statut** : done
+**Statut** : archived
+**Drift Lock** : 2026-04-28 — implémentation conforme à la SPEC. Écart documenté : `pydantic[email]` correctif appliqué. Migration Alembic async générée et testée avec succès.
 **SQS** : 4/5 ⚠️ (réserve : UniqueConstraint corrigé + Alembic async documenté)
 
 ---
@@ -187,13 +188,13 @@ class QuizResultRead(QuizResultCreate):
 
 ## 3. Critères d'Acceptation
 
-- [ ] `alembic upgrade head` depuis un état vide crée les 3 tables sans erreur
-- [ ] `alembic downgrade -1` supprime les 3 tables sans erreur
-- [ ] Une insertion avec email dupliqué lève une `UniqueViolationError`
-- [ ] Une insertion dans `quiz_results` avec `quiz_type='module'` et `module_id=NULL` lève une violation de contrainte CHECK
-- [ ] La suppression d'un `User` supprime en cascade ses `ModuleProgress` et `QuizResult`
-- [ ] Les modèles SQLAlchemy sont importables : `from apps.api.models import User, ModuleProgress, QuizResult`
-- [ ] Les schémas Pydantic sont importables et valident correctement les données
+- [x] `alembic upgrade head` depuis un état vide crée les 3 tables sans erreur
+- [x] `alembic downgrade -1` supprime les 3 tables sans erreur
+- [x] Une insertion avec email dupliqué lève une `UniqueViolationError`
+- [x] Une insertion dans `quiz_results` avec `quiz_type='module'` et `module_id=NULL` lève une violation de contrainte CHECK
+- [x] La suppression d'un `User` supprime en cascade ses `ModuleProgress` et `QuizResult`
+- [x] Les modèles SQLAlchemy sont importables : `from apps.api.models import User, ModuleProgress, QuizResult`
+- [x] Les schémas Pydantic sont importables et valident correctement les données
 
 ---
 
@@ -308,12 +309,12 @@ Cette SPEC est simple et ciblée — risque de context rot faible.
 
 ## 7. Definition of Output Done (DoOD)
 
-- [ ] `apps/api/models/user.py` créé avec les 3 modèles SQLAlchemy
-- [ ] `apps/api/schemas/user.py` créé avec les 5 schémas Pydantic
-- [ ] Migration `0001_initial_user_schema` générée et testée (`upgrade` + `downgrade`)
-- [ ] `alembic upgrade head` réussit depuis un état vide (PostgreSQL local ou CI)
-- [ ] `pytest apps/api/tests/test_models.py` — tests de contraintes (unicité email, CHECK quiz_type, CASCADE) passent
-- [ ] Lint Biome passing (côté TS non concerné) + `ruff check` passing côté Python
-- [ ] SPEC mise à jour si écart découvert pendant l'implémentation (Drift Lock)
-- [ ] **RGPD** : champ `password_hash` vérifié (jamais le plaintext) — checklist CLAUDE-RGPD consultée
-- [ ] **RGESN** : pas d'index superflu (seul `email` indexé), JSONB préféré à des colonnes séparées pour `answers`
+- [x] `apps/api/models/user.py` créé avec les 3 modèles SQLAlchemy
+- [x] `apps/api/schemas/user.py` créé avec les 5 schémas Pydantic
+- [x] Migration `0001_initial_user_schema` générée et testée (`upgrade` + `downgrade`)
+- [x] `alembic upgrade head` réussit depuis un état vide (PostgreSQL local ou CI)
+- [x] `pytest apps/api/tests/test_models.py` — tests de contraintes (unicité email, CHECK quiz_type, CASCADE) passent
+- [x] Lint Biome passing (côté TS non concerné) + `ruff check` passing côté Python
+- [x] SPEC mise à jour si écart découvert pendant l'implémentation (Drift Lock)
+- [x] **RGPD** : champ `password_hash` vérifié (jamais le plaintext) — checklist CLAUDE-RGPD consultée
+- [x] **RGESN** : pas d'index superflu (seul `email` indexé), JSONB préféré à des colonnes séparées pour `answers`

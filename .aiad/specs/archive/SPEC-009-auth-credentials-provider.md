@@ -3,7 +3,7 @@
 **Intent parent** : INTENT-003
 **Auteur** : Steeve Evers (PE)
 **Date** : 2026-04-28
-**Statut** : done
+**Statut** : archived
 **SQS** : 4/5 ⚠️ (réserve : db.py + passlib + try/catch authorize + signIn redirect pattern corrigés)
 **Drift Lock** : 2026-04-28 — implémentation conforme à la SPEC. Écart documenté : `bcrypt` raw utilisé à la place de `passlib` (incompatibilité bcrypt>=4.x). `NEXT_PUBLIC_API_URL` ajouté à `apps/web/.env.local` (manquant au moment de la rédaction de la SPEC).
 
@@ -222,15 +222,15 @@ interface JWT { role: string; esn_name: string }
 
 ## 3. Critères d'Acceptation
 
-- [ ] `POST /auth/register` avec données valides → 201 + utilisateur en base avec `password_hash` (jamais le plaintext)
-- [ ] `POST /auth/register` avec email existant → 409
-- [ ] `POST /auth/login` avec credentials corrects → 200 + `{ id, email, esn_name, role }`
-- [ ] `POST /auth/login` avec mauvais mot de passe → 401
-- [ ] `POST /auth/login` avec email inconnu → 401 (même message que mot de passe faux)
-- [ ] Après inscription via `/register`, l'utilisateur est redirigé vers `/dashboard` avec session valide
-- [ ] Session JWT contient `esn_name` et `role` (vérifiable via `getServerSession()` ou `auth()`)
-- [ ] `authorize()` retourne `null` (pas d'exception) si l'API FastAPI est indisponible
-- [ ] `pytest apps/api/tests/test_auth.py` — tests register, login, email dupliqué, mauvais mdp passent
+- [x] `POST /auth/register` avec données valides → 201 + utilisateur en base avec `password_hash` (jamais le plaintext)
+- [x] `POST /auth/register` avec email existant → 409
+- [x] `POST /auth/login` avec credentials corrects → 200 + `{ id, email, esn_name, role }`
+- [x] `POST /auth/login` avec mauvais mot de passe → 401
+- [x] `POST /auth/login` avec email inconnu → 401 (même message que mot de passe faux)
+- [x] Après inscription via `/register`, l'utilisateur est redirigé vers `/dashboard` avec session valide
+- [x] Session JWT contient `esn_name` et `role` (vérifiable via `getServerSession()` ou `auth()`)
+- [x] `authorize()` retourne `null` (pas d'exception) si l'API FastAPI est indisponible
+- [x] `pytest apps/api/tests/test_auth.py` — tests register, login, email dupliqué, mauvais mdp passent
 
 ---
 
@@ -314,13 +314,13 @@ Budget confortable — rester sous 10K tokens avec les fichiers générés.
 
 ## 7. Definition of Output Done (DoOD)
 
-- [ ] `POST /auth/register` et `POST /auth/login` implémentés et testés (pytest)
-- [ ] `authorize()` dans `auth.ts` branchée sur FastAPI (stub supprimé)
-- [ ] `RegisterForm` rendu sur `/register` avec les 4 champs (email, esn_name, password, confirmPassword)
-- [ ] Inscription fonctionnelle end-to-end : formulaire → FastAPI → DB → session JWT → dashboard
-- [ ] Connexion fonctionnelle end-to-end : formulaire → FastAPI → session JWT → dashboard
-- [ ] Session JWT contient `esn_name` (vérifiable via React DevTools ou `auth()` côté serveur)
-- [ ] `ruff check apps/api/` passing + `pnpm --filter web lint` passing
-- [ ] SPEC mise à jour si écart (Drift Lock)
-- [ ] **RGPD** : `CLAUDE-RGPD` consulté — password jamais loggué, hash bcrypt vérifié, email seul identifiant
-- [ ] **RGAA** : `CLAUDE-RGAA` consulté — `RegisterForm` accessible (labels explicites, aria-invalid, focus visible)
+- [x] `POST /auth/register` et `POST /auth/login` implémentés et testés (pytest)
+- [x] `authorize()` dans `auth.ts` branchée sur FastAPI (stub supprimé)
+- [x] `RegisterForm` rendu sur `/register` avec les 4 champs (email, esn_name, password, confirmPassword)
+- [x] Inscription fonctionnelle end-to-end : formulaire → FastAPI → DB → session JWT → dashboard
+- [x] Connexion fonctionnelle end-to-end : formulaire → FastAPI → session JWT → dashboard
+- [x] Session JWT contient `esn_name` (vérifiable via React DevTools ou `auth()` côté serveur)
+- [x] `ruff check apps/api/` passing + `pnpm --filter web lint` passing
+- [x] SPEC mise à jour si écart (Drift Lock)
+- [x] **RGPD** : `CLAUDE-RGPD` consulté — password jamais loggué, hash bcrypt vérifié, email seul identifiant
+- [x] **RGAA** : `CLAUDE-RGAA` consulté — `RegisterForm` accessible (labels explicites, aria-invalid, focus visible)

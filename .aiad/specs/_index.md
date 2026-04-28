@@ -13,9 +13,10 @@
 | [SPEC-005](archive/SPEC-005-mdx-content-rendering.md) | Contenu MDX + Rendu modules | INTENT-002 | 5/5 ✅ | done | commit SPEC-005 |
 | [SPEC-006](archive/SPEC-006-quiz-module-component.md) | Composant Quiz de fin de module | INTENT-002 | 4/5 ⚠️ | done | commit SPEC-006 |
 | [SPEC-007](archive/SPEC-007-quiz-parcours-final.md) | Quiz de fin de parcours (Certification) | INTENT-002 | 4/5 ⚠️ | done | commit SPEC-007 |
-| [SPEC-008](SPEC-008-db-schema-user-progression.md) | Schéma DB utilisateur + progression + quiz | INTENT-003 | 4/5 ⚠️ | done | — |
-| [SPEC-009](SPEC-009-auth-credentials-provider.md) | Auth.js credentials + endpoints FastAPI register/login | INTENT-003 | 4/5 ⚠️ | done | — |
-| [SPEC-010](SPEC-010-route-protection-progression.md) | Protection routes + persistance progression et quiz | INTENT-003 | 4/5 ⚠️ | done | — |
+| [SPEC-008](archive/SPEC-008-db-schema-user-progression.md) | Schéma DB utilisateur + progression + quiz | INTENT-003 | 4/5 ⚠️ | archived | — |
+| [SPEC-009](archive/SPEC-009-auth-credentials-provider.md) | Auth.js credentials + endpoints FastAPI register/login | INTENT-003 | 4/5 ⚠️ | archived | — |
+| [SPEC-010](archive/SPEC-010-route-protection-progression.md) | Protection routes + persistance progression et quiz | INTENT-003 | 4/5 ⚠️ | archived | — |
+| [SPEC-011](SPEC-011-instructor-badge.md) | InstructorBadge component + migration MDX (24 marqueurs) | INTENT-004 | 4/5 ⚠️ | ready | — |
 
 ## Statuts possibles
 
