@@ -17,6 +17,43 @@
 
 <!-- Ajoutez vos entrées ci-dessous, les plus récentes en haut -->
 
+## 2026-04-28 — SPEC-013 — Drift Lock ✅ (statut `done`) + INTENT-005 → `livré`
+
+**Auteur** : Steeve Evers (PE) via Claude Code (`/sdd-exec` + `/sdd-validate` + `/sdd-drift-check`)
+**Raison** : Clôture SPEC-013 — Dashboard progression (quiz module % + historique évaluation finale)
+**Impact** : SPEC-013 → `done` ; INTENT-005 → `livré` (les deux SPECs 012 + 013 livrées)
+
+### Résultats validation
+
+- Biome (lint) : ✅ PASS — 51 fichiers, imports réordonnés automatiquement
+- TypeScript / Build Next.js : ✅ PASS — route `/dashboard` compilée sans erreur
+- Playwright E2E : ✅ 41/41 passes, 1 skip attendu — aucune régression suite complète
+
+### Fichiers modifiés (code — périmètre SPEC-013)
+
+- `apps/web/app/(learner)/dashboard/page.tsx` — `answered_at` dans `QuizResultItem`, `getModuleStatus` enrichi avec `(Z%)`, section "Évaluation finale" + `getCertificationLevel`
+- `apps/web/e2e/dashboard-progression.spec.ts` — 6 tests E2E (badge score, état vide, tentatives finales, accessibilité)
+
+### Drifts documentés
+
+- **Drift A** (intentionnel) — `page.route()` remplacé par données réelles DB + `request` fixture Playwright. `page.route()` n'intercepte pas les `fetch()` Node.js d'un Server Component Next.js. Human Learning documenté dans `AGENT-GUIDE.md`.
+
+### Vérification Critère de Drift INTENT-005
+
+- Dashboard utilise `getAllModules()` (registry dynamique) — un nouveau module MDX apparaît automatiquement ✅
+- Scores récupérés dynamiquement depuis `GET /progress` par `module_id === slug` ✅
+- Aucun couplage à une liste statique de modules ✅
+
+### Artefacts AIAD mis à jour
+
+- `specs/SPEC-013-dashboard-progression.md` → statut `done`, DoOD coché, §8 Notes de Drift Lock ajouté
+- `specs/_index.md` → statut `done`, PR `commit SPEC-013`
+- `intents/INTENT-005-dashboard-progression-logout.md` → statut `livré`
+- `AGENT-GUIDE.md` → Human Learning `page.route()` Server Component ajouté (commit précédent)
+- `CHANGELOG-ARTEFACTS.md` (cette entrée)
+
+---
+
 ## 2026-04-28 — SPEC-012 — Drift Lock ✅ (statut `done`)
 
 **Auteur** : Steeve Evers (PE) via Claude Code (`/sdd-validate` + `/sdd-drift-check`)
