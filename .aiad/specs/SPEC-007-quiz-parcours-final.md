@@ -3,7 +3,7 @@
 **Intent parent** : INTENT-002
 **Auteur** : Steeve Evers
 **Date** : 2026-04-27
-**Statut** : ready
+**Statut** : done
 **SQS** : 4/5 ⚠️ (réserve : mobile-nav ajouté au périmètre)
 
 ---
@@ -159,16 +159,34 @@ export default function EvaluationFinalePage() {
 
 ## 7. Definition of Output Done (DoOD)
 
-- [ ] `packages/shared-types/src/quiz.ts` : `CertificationLevel` + `getCertificationLevel()` exportés
-- [ ] `app/(learner)/evaluation-finale/questions.ts` créé avec les 18 questions
-- [ ] `components/quiz/final-quiz.tsx` implémenté (`"use client"`, state machine 2 états)
-- [ ] `app/(learner)/evaluation-finale/page.tsx` créé et accessible
-- [ ] `components/layout/sidebar.tsx` : lien "Évaluation finale" ajouté sous la liste des modules
-- [ ] `components/layout/mobile-nav.tsx` : même lien ajouté (avec `onClick={() => setIsOpen(false)}` pour fermer le panneau mobile)
-- [ ] Tests Vitest : `getCertificationLevel` (0→AI Curious, 9→AI Practitioner, 14→AI Engineer Junior, 18→AI Engineer), calcul `moduleScore` par groupe de 3
-- [ ] `pnpm lint` passing
-- [ ] `pnpm typecheck --filter web` passing
-- [ ] `pnpm test --filter web` passing
-- [ ] SPEC mise à jour si écart durant l'implémentation (Drift Lock)
-- [ ] Gouvernance RGAA vérifiée : `<h1>` unique, navigation clavier radio native (Flèches ↑↓), `role="status"` sur le niveau certifié, `aria-current="page"` sur lien sidebar actif
-- [ ] Gouvernance RGESN vérifiée : page SSR statique, aucune dépendance externe ajoutée
+- [x] `packages/shared-types/src/quiz.ts` : `CertificationLevel` + `getCertificationLevel()` exportés
+- [x] `app/(learner)/evaluation-finale/questions.ts` créé avec les 18 questions
+- [x] `components/quiz/final-quiz.tsx` implémenté (`"use client"`, state machine **3 états** — voir §8)
+- [x] `app/(learner)/evaluation-finale/page.tsx` créé et accessible
+- [x] `components/layout/sidebar.tsx` : lien "Évaluation finale" ajouté sous la liste des modules
+- [x] `components/layout/mobile-nav.tsx` : même lien ajouté (avec `onClick={() => setIsOpen(false)}` pour fermer le panneau mobile)
+- [x] Tests Vitest : `getCertificationLevel` (7 cas de borne), calcul `moduleScore` par groupe de 3 (6 cas)
+- [x] `pnpm lint` passing
+- [x] `pnpm typecheck --filter web` passing
+- [x] `pnpm test --filter web` passing — 34/34
+- [x] SPEC mise à jour (Drift Lock — §8)
+- [x] Gouvernance RGAA vérifiée : `<h1>` unique, `<fieldset>/<legend>` sur radios, `<output aria-live="polite">` sur le niveau certifié, `aria-current="page"` sur lien sidebar actif
+- [x] Gouvernance RGESN vérifiée : page SSR statique (○ build), 2.81 kB JS spécifique, aucune dépendance externe ajoutée
+
+---
+
+## 8. Notes de Drift Check (2026-04-28)
+
+**Drift A — État `intro` ajouté à la state machine**
+
+- **SPEC** : `FinalQuizState = answering | completed` (2 états)
+- **Code** : `FinalQuizState = intro | answering | completed` (3 états)
+- **Raison** : le flux UX §2 décrit explicitement un état d'accueil ("bouton Commencer") et un retour à cet état ("Recommencer → état initial"). L'état `intro` est nécessaire pour implémenter ce comportement ; son absence dans le type TypeScript de la SPEC était une omission, pas une contrainte.
+- **Verdict** : drift intentionnel, cohérent avec l'intention — **pas de régression**
+
+**Drift B — `role="status"` remplacé par `<output>`**
+
+- **SPEC** : "role='status' sur le niveau certifié"
+- **Code** : `<output aria-live="polite">` (élément sémantique HTML natif)
+- **Raison** : règle Biome `lint/a11y/useSemanticElements` — `<output>` est l'élément HTML sémantique équivalent, préférable à `<div role="status">`.
+- **Verdict** : amélioration RGAA, conforme à l'intention

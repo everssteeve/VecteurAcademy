@@ -17,6 +17,47 @@
 
 <!-- Ajoutez vos entrées ci-dessous, les plus récentes en haut -->
 
+## 2026-04-28 — SPEC-007 — Drift Lock ✅ (statut `done`) + INTENT-002 → `livré`
+
+**Auteur** : Steeve Evers (PE) via Claude Code
+**Raison** : Validation QA complète + Drift Lock SPEC-007 — Quiz de fin de parcours (Certification)
+**Impact** : SPEC-007 → statut `done` ; INTENT-002 → statut `livré` (toutes les SPECs 005/006/007 livrées)
+
+### Résultats validation
+
+- Lint (biome) : ✅ PASS
+- Typecheck (tsc) : ✅ PASS
+- Tests (vitest) : ✅ 34/34 (13 nouveaux tests SPEC-007)
+- Build (next build) : ✅ PASS — `/evaluation-finale` statique (○), 2.81 kB
+- RGAA : `<h1>` unique, `<fieldset>/<legend>`, `<output aria-live="polite">`, `aria-current="page"` — conforme
+- RGESN : page SSR statique, zéro dépendance externe ajoutée, bundle < 200 kB gzippé
+
+### Fichiers produits (code)
+
+- `packages/shared-types/src/quiz.ts` — `CertificationLevel` + `getCertificationLevel()` ajoutés
+- `packages/shared-types/index.ts` — exports mis à jour
+- `apps/web/app/(learner)/evaluation-finale/page.tsx` — nouvelle page SSR statique
+- `apps/web/app/(learner)/evaluation-finale/questions.ts` — 18 questions issues de `formationIA.md`
+- `apps/web/components/quiz/final-quiz.tsx` — composant `"use client"`, state machine 3 états
+- `apps/web/components/quiz/__tests__/final-quiz.test.ts` — 13 tests Vitest
+- `apps/web/components/layout/sidebar.tsx` — lien "Évaluation finale" + `aria-current`
+- `apps/web/components/layout/mobile-nav.tsx` — même lien + `onClick={() => setIsOpen(false)}`
+
+### Drifts documentés (intentionnels)
+
+- **Drift A** — État `intro` ajouté à la state machine (SPEC : 2 états, code : 3 états) — implémentation du flux UX "Commencer/Recommencer" décrit §2 mais absent du type TypeScript
+- **Drift B** — `<output>` au lieu de `<div role="status">` — règle Biome `lint/a11y/useSemanticElements`, amélioration RGAA
+
+### Artefacts AIAD mis à jour
+
+- `specs/SPEC-007-quiz-parcours-final.md` → statut `done`, DoOD coché, §8 Notes de Drift ajouté
+- `specs/_index.md` → statut `done`, PR `commit SPEC-007`
+- `intents/INTENT-002-contenu-modules-quiz.md` → statut `livré`
+- `intents/_index.md` → statut `livré`
+- `CHANGELOG-ARTEFACTS.md` (cette entrée)
+
+---
+
 ## 2026-04-28 — SPEC-006 — Drift Lock ✅ (statut `done`)
 
 **Auteur** : Steeve Evers (PE) via Claude Code

@@ -3,7 +3,7 @@ id: INTENT-002
 name: Contenu modules + quiz de fin de parcours
 description: Peupler les 6 modules MDX avec le contenu formationIA.md, ajouter les quiz de fin de module, et créer un quiz de fin de parcours complet.
 type: project
-status: validé
+status: livré
 ---
 
 # INTENT-002 — Contenu modules + quiz de fin de parcours

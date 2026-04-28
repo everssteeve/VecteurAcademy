@@ -1,5 +1,6 @@
 export type { ModuleMetadata, ModuleWithContent } from './src/module'
-export type { QuizQuestion } from './src/quiz'
+export type { QuizQuestion, CertificationLevel } from './src/quiz'
+export { getCertificationLevel } from './src/quiz'
 
 export type UserRole = "learner" | "trainer" | "admin"
 

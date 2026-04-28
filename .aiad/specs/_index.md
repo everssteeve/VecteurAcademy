@@ -12,7 +12,7 @@
 | [SPEC-004](archive/SPEC-004-auth-shell.md) | Auth Shell | INTENT-001 | 5/5 ✅ | done | commit SPEC-004 |
 | [SPEC-005](SPEC-005-mdx-content-rendering.md) | Contenu MDX + Rendu modules | INTENT-002 | 5/5 ✅ | done | commit SPEC-005 |
 | [SPEC-006](SPEC-006-quiz-module-component.md) | Composant Quiz de fin de module | INTENT-002 | 4/5 ⚠️ | done | commit SPEC-006 |
-| [SPEC-007](SPEC-007-quiz-parcours-final.md) | Quiz de fin de parcours (Certification) | INTENT-002 | 4/5 ⚠️ | ready | — |
+| [SPEC-007](SPEC-007-quiz-parcours-final.md) | Quiz de fin de parcours (Certification) | INTENT-002 | 4/5 ⚠️ | done | commit SPEC-007 |
 
 ## Statuts possibles
 

@@ -19,7 +19,10 @@ export function Sidebar({ modules, currentPath }: SidebarProps): React.JSX.Eleme
           {appName}
         </Link>
       </div>
-      <nav aria-label="Navigation principale" className="flex-1 overflow-y-auto p-4">
+      <nav
+        aria-label="Navigation principale"
+        className="flex-1 overflow-y-auto p-4 flex flex-col gap-4"
+      >
         {modules.length === 0 ? (
           <p className="text-sm text-gray-500 dark:text-gray-400 px-3 py-2">
             Aucun module disponible
@@ -52,6 +55,23 @@ export function Sidebar({ modules, currentPath }: SidebarProps): React.JSX.Eleme
             })}
           </ul>
         )}
+        <div className="border-t border-gray-200 dark:border-gray-800 pt-3">
+          <Link
+            href="/evaluation-finale"
+            aria-current={currentPath === "/evaluation-finale" ? "page" : undefined}
+            className={[
+              "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+              currentPath === "/evaluation-finale"
+                ? "bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-medium"
+                : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
+            ].join(" ")}
+          >
+            <span aria-hidden="true" className="text-base">
+              🎓
+            </span>
+            <span>Évaluation finale</span>
+          </Link>
+        </div>
       </nav>
     </aside>
   )
