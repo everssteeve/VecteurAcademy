@@ -1,5 +1,6 @@
 import { Quiz } from "@/components/quiz/quiz"
 import type { ComponentPropsWithoutRef } from "react"
+import { InstructorBadge } from "./instructor-badge"
 
 type HeadingProps = ComponentPropsWithoutRef<"h1">
 type ParagraphProps = ComponentPropsWithoutRef<"p">
@@ -11,6 +12,7 @@ type PreProps = ComponentPropsWithoutRef<"pre">
 
 export const mdxComponents = {
   Quiz,
+  InstructorBadge,
   h1: ({ children, ...props }: HeadingProps) => (
     <h1 className="text-3xl font-bold mt-8 mb-4" {...props}>
       {children}

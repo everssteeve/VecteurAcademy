@@ -94,3 +94,25 @@ test.describe("Navigation Shell — SPEC-003", () => {
     }
   })
 })
+
+test.describe("InstructorBadge — SPEC-011", () => {
+  test("InstructorBadge Steeve Evers visible sur /modules/ai-engineering", async ({ page }) => {
+    await page.goto("/modules/ai-engineering")
+    const badge = page.getByRole("img", { name: "Steeve Evers" })
+    await expect(badge.first()).toBeVisible()
+  })
+
+  test("InstructorBadge : 4 avatars Steeve Evers dans le module ai-engineering", async ({
+    page,
+  }) => {
+    await page.goto("/modules/ai-engineering")
+    const badges = page.getByRole("img", { name: "Steeve Evers" })
+    await expect(badges).toHaveCount(4)
+  })
+
+  test("InstructorBadge Dr Lena Voss visible sur /modules/ai-engineering", async ({ page }) => {
+    await page.goto("/modules/ai-engineering")
+    const badge = page.getByRole("img", { name: "Dr Lena Voss" })
+    await expect(badge).toBeVisible()
+  })
+})

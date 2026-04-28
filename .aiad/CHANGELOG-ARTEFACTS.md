@@ -17,6 +17,46 @@
 
 <!-- Ajoutez vos entrées ci-dessous, les plus récentes en haut -->
 
+## 2026-04-28 — SPEC-011 — Drift Lock ✅ (statut `done`) + INTENT-004 → `livré`
+
+**Auteur** : Steeve Evers (PE) via Claude Code (`/sdd-validate` + `/sdd-drift-check`)
+**Raison** : Clôture SPEC-011 — InstructorBadge component + migration MDX (30 marqueurs : 24 `💼` + 6 `🔬`)
+**Impact** : SPEC-011 → `done` ; INTENT-004 → `livré` (seule SPEC liée livrée)
+
+### Résultats validation
+
+- Biome (lint) : ✅ PASS — 50 fichiers, aucun fix appliqué
+- TypeScript / Build Next.js : ✅ PASS — 6 slugs SSG générés
+- Playwright E2E : ✅ 32/32 (3 nouveaux SPEC-011 + 29 sans régression)
+- Vérification visuelle browser : ✅ 4× Steeve Evers + 1× Dr Lena Voss sur `/modules/ai-engineering`
+
+### Fichiers créés (code)
+
+- `apps/web/components/mdx/instructor-badge.tsx` — composant `InstructorBadge`, union littérale typée, `next/image` 56×56
+- `apps/web/public/instructors/steeve-evers.png` — photo Steeve Evers
+- `apps/web/public/instructors/dr-lena-voss.png` — photo Dr Lena Voss
+
+### Fichiers modifiés (code)
+
+- `apps/web/components/mdx/mdx-components.tsx` — `InstructorBadge` enregistré dans `mdxComponents`
+- `apps/web/content/modules/0{1-6}-*.mdx` — 24 marqueurs `💼 **Steeve**` + 6 marqueurs `🔬 **Dr. Lena Voss**` → `<InstructorBadge name="..." />`
+- `apps/web/e2e/navigation.spec.ts` — suite `InstructorBadge — SPEC-011` ajoutée (3 tests)
+
+### Drifts documentés (intentionnels)
+
+- **Drift A** — 6 marqueurs `🔬 **Dr. Lena Voss**` omis dans le DoOD initial de la SPEC → découverts en livraison, implémentés et DoOD corrigé post-livraison (SPEC-011 §7)
+
+### Incident technique (toolchain)
+
+- Erreur Turbopack "module factory not available" sur le serveur de dev après ajout de `instructor-badge.tsx` → redémarrage du serveur requis avant tests E2E. Documenté dans AGENT-GUIDE (Lessons Learned).
+
+### Artefacts AIAD mis à jour
+
+- `intents/INTENT-004-instructor-avatar.md` → statut `draft` → `livré`, checkbox SPEC-011 cochée
+- `intents/_index.md` → INTENT-004 SPECs liées `SPEC-011`, statut `livré`
+- `AGENT-GUIDE.md` → Lessons Learned Turbopack ajouté
+- `CHANGELOG-ARTEFACTS.md` (cette entrée)
+
 ## 2026-04-28 — SPEC-010 — Drift Lock ✅ (statut `done`) + INTENT-003 → `livré`
 
 **Auteur** : Steeve Evers (PE) via Claude Code (`/sdd-exec` + `/sdd-validate` + `/sdd-drift-check`)
