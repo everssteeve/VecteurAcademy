@@ -3,6 +3,7 @@
 Requires PostgreSQL with DATABASE_URL set.
 Run: uv run pytest tests/test_progress.py
 """
+
 import os
 
 from httpx import ASGITransport, AsyncClient
@@ -41,7 +42,9 @@ async def setup_db():
 @pytest_asyncio.fixture
 async def client() -> AsyncClient:
     app.dependency_overrides[get_session] = override_get_session
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as c:
         yield c
     app.dependency_overrides.clear()
 
@@ -50,7 +53,11 @@ async def client() -> AsyncClient:
 async def user_id(client: AsyncClient) -> str:
     resp = await client.post(
         "/auth/register",
-        json={"email": "learner@esn.fr", "password": "Secur3P@ss", "esn_name": "TestESN"},
+        json={
+            "email": "learner@esn.fr",
+            "password": "Secur3P@ss",
+            "esn_name": "TestESN",
+        },
     )
     assert resp.status_code == 201
     return resp.json()["id"]
@@ -141,7 +148,11 @@ async def test_save_final_quiz_result(client: AsyncClient, user_id: str):
 async def test_get_progress_returns_only_own_data(client: AsyncClient, user_id: str):
     resp2 = await client.post(
         "/auth/register",
-        json={"email": "other@esn.fr", "password": "Secur3P@ss", "esn_name": "OtherESN"},
+        json={
+            "email": "other@esn.fr",
+            "password": "Secur3P@ss",
+            "esn_name": "OtherESN",
+        },
     )
     other_id = resp2.json()["id"]
 

@@ -3,6 +3,7 @@
 Requires PostgreSQL with DATABASE_URL set (e.g. postgresql+asyncpg://postgres:postgres@localhost:5432/test_formations_ia).
 Run: uv run pytest tests/test_models.py
 """
+
 import os
 
 import pytest
@@ -66,7 +67,9 @@ async def test_module_progress_unique_per_user_module(session: AsyncSession):
         await session.commit()
 
 
-async def test_quiz_result_check_module_id_required_for_module_type(session: AsyncSession):
+async def test_quiz_result_check_module_id_required_for_module_type(
+    session: AsyncSession,
+):
     user = await _make_user(session)
     with pytest.raises(IntegrityError):
         qr = QuizResult(
@@ -101,7 +104,11 @@ async def test_cascade_delete(session: AsyncSession):
     await session.delete(user)
     await session.commit()
 
-    mp_count = await session.scalar(select(func.count()).where(ModuleProgress.user_id == user.id))
-    qr_count = await session.scalar(select(func.count()).where(QuizResult.user_id == user.id))
+    mp_count = await session.scalar(
+        select(func.count()).where(ModuleProgress.user_id == user.id)
+    )
+    qr_count = await session.scalar(
+        select(func.count()).where(QuizResult.user_id == user.id)
+    )
     assert mp_count == 0
     assert qr_count == 0

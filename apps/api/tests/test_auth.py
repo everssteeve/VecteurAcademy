@@ -3,6 +3,7 @@
 Requires PostgreSQL with DATABASE_URL set.
 Run: uv run pytest tests/test_auth.py
 """
+
 import os
 
 from httpx import ASGITransport, AsyncClient
@@ -41,7 +42,9 @@ async def setup_db():
 @pytest_asyncio.fixture
 async def client() -> AsyncClient:
     app.dependency_overrides[get_session] = override_get_session
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as c:
         yield c
     app.dependency_overrides.clear()
 
@@ -97,6 +100,10 @@ async def test_login_unknown_email(client: AsyncClient):
 
 async def test_login_same_error_for_wrong_pw_and_unknown_email(client: AsyncClient):
     await client.post("/auth/register", json=_VALID_USER)
-    r1 = await client.post("/auth/login", json={"email": _VALID_USER["email"], "password": "Wrong1"})
-    r2 = await client.post("/auth/login", json={"email": "nobody@esn.fr", "password": "Secur3P@ss"})
+    r1 = await client.post(
+        "/auth/login", json={"email": _VALID_USER["email"], "password": "Wrong1"}
+    )
+    r2 = await client.post(
+        "/auth/login", json={"email": "nobody@esn.fr", "password": "Secur3P@ss"}
+    )
     assert r1.json()["detail"] == r2.json()["detail"]
