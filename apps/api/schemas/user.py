@@ -8,12 +8,16 @@ from pydantic import BaseModel, EmailStr
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
+    first_name: str
+    last_name: str
     esn_name: str
 
 
 class UserRead(BaseModel):
     id: uuid.UUID
     email: EmailStr
+    first_name: str | None
+    last_name: str | None
     esn_name: str
     role: str
     created_at: datetime
