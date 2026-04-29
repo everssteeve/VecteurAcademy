@@ -39,24 +39,17 @@ test.describe("Dashboard progression — SPEC-013", () => {
     // la DB de test n'est pas nettoyée entre les runs. Relancer le setup e2e pour repartir à 0.)
     const resp = await fetch(`${API_URL}/progress?user_id=${E2E_USER_ID}`)
     const data = await resp.json()
-    const hasFinal = data.quiz_results.some(
-      (r: { quiz_type: string }) => r.quiz_type === "final"
-    )
+    const hasFinal = data.quiz_results.some((r: { quiz_type: string }) => r.quiz_type === "final")
     if (hasFinal) {
       test.skip()
       return
     }
 
     await page.goto("/dashboard")
-    await expect(
-      page.getByText("Pas encore de tentative à l'évaluation finale.")
-    ).toBeVisible()
+    await expect(page.getByText("Pas encore de tentative à l'évaluation finale.")).toBeVisible()
   })
 
-  test("tentative finale affiche score et niveau de certification", async ({
-    request,
-    page,
-  }) => {
+  test("tentative finale affiche score et niveau de certification", async ({ request, page }) => {
     // POST un résultat final via l'API réelle (score 14/18 → 🟠 AI Engineer Junior)
     const res = await request.post(`${API_URL}/quiz/result`, {
       data: {
@@ -78,9 +71,7 @@ test.describe("Dashboard progression — SPEC-013", () => {
   test("accessibilité : section h2 + liste sémantique", async ({ page }) => {
     // Requiert un résultat final en DB (posté par le test précédent en mode serial)
     await page.goto("/dashboard")
-    await expect(
-      page.getByRole("heading", { level: 2, name: "Évaluation finale" })
-    ).toBeVisible()
+    await expect(page.getByRole("heading", { level: 2, name: "Évaluation finale" })).toBeVisible()
     const region = page.getByRole("region", { name: "Évaluation finale" })
     const list = region.getByRole("list")
     await expect(list).toBeVisible()

@@ -49,7 +49,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        const u = user as { role: string; first_name: string | null; last_name: string | null; esn_name: string }
+        const u = user as {
+          role: string
+          first_name: string | null
+          last_name: string | null
+          esn_name: string
+        }
         token.role = u.role
         token.first_name = u.first_name
         token.last_name = u.last_name
