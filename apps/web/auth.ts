@@ -32,7 +32,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           if (!res.ok) return null
 
           const user = await res.json()
-          return { id: user.id, email: user.email, role: user.role, esn_name: user.esn_name }
+          return {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            first_name: user.first_name ?? null,
+            last_name: user.last_name ?? null,
+            esn_name: user.esn_name,
+          }
         } catch {
           return null
         }
@@ -42,14 +49,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        token.role = user.role
-        token.esn_name = (user as { esn_name: string }).esn_name
+        const u = user as { role: string; first_name: string | null; last_name: string | null; esn_name: string }
+        token.role = u.role
+        token.first_name = u.first_name
+        token.last_name = u.last_name
+        token.esn_name = u.esn_name
       }
       return token
     },
     session({ session, token }) {
       session.user.id = token.sub as string
       session.user.role = token.role as string
+      session.user.first_name = (token.first_name as string | null) ?? null
+      session.user.last_name = (token.last_name as string | null) ?? null
       session.user.esn_name = token.esn_name as string
       return session
     },

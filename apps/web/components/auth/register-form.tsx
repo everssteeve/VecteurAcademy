@@ -5,6 +5,8 @@ import { registerSchema } from "@/lib/schemas/auth"
 import { useActionState, useState } from "react"
 
 type FieldErrors = {
+  first_name?: string
+  last_name?: string
   email?: string
   esn_name?: string
   password?: string
@@ -18,6 +20,8 @@ export function RegisterForm() {
   function validateClient(event: React.FormEvent<HTMLFormElement>) {
     const fd = new FormData(event.currentTarget)
     const result = registerSchema.safeParse({
+      first_name: fd.get("first_name"),
+      last_name: fd.get("last_name"),
       email: fd.get("email"),
       esn_name: fd.get("esn_name"),
       password: fd.get("password"),
@@ -43,6 +47,64 @@ export function RegisterForm() {
   return (
     <form action={formAction} onSubmit={validateClient} noValidate>
       <div className="space-y-5">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label
+              htmlFor="first_name"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Prénom
+            </label>
+            <input
+              id="first_name"
+              name="first_name"
+              type="text"
+              autoComplete="given-name"
+              required
+              className={inputClass}
+              aria-invalid={fieldErrors.first_name ? true : undefined}
+              aria-describedby={fieldErrors.first_name ? "first-name-error" : undefined}
+            />
+            {fieldErrors.first_name && (
+              <p
+                id="first-name-error"
+                role="alert"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              >
+                {fieldErrors.first_name}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="last_name"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Nom
+            </label>
+            <input
+              id="last_name"
+              name="last_name"
+              type="text"
+              autoComplete="family-name"
+              required
+              className={inputClass}
+              aria-invalid={fieldErrors.last_name ? true : undefined}
+              aria-describedby={fieldErrors.last_name ? "last-name-error" : undefined}
+            />
+            {fieldErrors.last_name && (
+              <p
+                id="last-name-error"
+                role="alert"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              >
+                {fieldErrors.last_name}
+              </p>
+            )}
+          </div>
+        </div>
+
         <div>
           <label
             htmlFor="email"

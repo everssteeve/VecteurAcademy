@@ -5,12 +5,20 @@ import type { ModuleMetadata } from "@formations-ia/shared-types"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 
+interface UserInfo {
+  email: string
+  first_name: string | null
+  last_name: string | null
+  esn_name: string
+}
+
 interface MobileNavProps {
   modules: ModuleMetadata[]
   currentPath: string
+  user?: UserInfo
 }
 
-export function MobileNav({ modules, currentPath }: MobileNavProps): React.JSX.Element {
+export function MobileNav({ modules, currentPath, user }: MobileNavProps): React.JSX.Element {
   const [isOpen, setIsOpen] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -139,6 +147,16 @@ export function MobileNav({ modules, currentPath }: MobileNavProps): React.JSX.E
             </Link>
           </div>
           <div className="border-t border-gray-200 dark:border-gray-800 pt-3">
+            {user && (
+              <div className="px-3 mb-3">
+                <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
+                  {user.first_name && user.last_name
+                    ? `${user.first_name} ${user.last_name}`
+                    : user.email}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.esn_name}</p>
+              </div>
+            )}
             <LogoutButton />
           </div>
         </nav>

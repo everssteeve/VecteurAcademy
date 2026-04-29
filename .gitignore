@@ -41,6 +41,7 @@ coverage/
 htmlcov/
 apps/web/playwright-report/
 apps/web/test-results/
+.playwright-mcp/
 
 # Claude Code local settings (machine-specific paths)
 .claude/settings.local.json

@@ -38,6 +38,8 @@ export async function registerAction(
     email: formData.get("email"),
     password: formData.get("password"),
     confirmPassword: formData.get("confirmPassword"),
+    first_name: formData.get("first_name"),
+    last_name: formData.get("last_name"),
     esn_name: formData.get("esn_name"),
   })
   if (!parsed.success) return { error: parsed.error.issues[0].message }
@@ -48,6 +50,8 @@ export async function registerAction(
     body: JSON.stringify({
       email: parsed.data.email,
       password: parsed.data.password,
+      first_name: parsed.data.first_name,
+      last_name: parsed.data.last_name,
       esn_name: parsed.data.esn_name,
     }),
     cache: "no-store",

@@ -2,12 +2,20 @@ import { LogoutButton } from "@/components/auth/logout-button"
 import type { ModuleMetadata } from "@formations-ia/shared-types"
 import Link from "next/link"
 
+interface UserInfo {
+  email: string
+  first_name: string | null
+  last_name: string | null
+  esn_name: string
+}
+
 interface SidebarProps {
   modules: ModuleMetadata[]
   currentPath: string
+  user?: UserInfo
 }
 
-export function Sidebar({ modules, currentPath }: SidebarProps): React.JSX.Element {
+export function Sidebar({ modules, currentPath, user }: SidebarProps): React.JSX.Element {
   const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "VecteurAcademy"
 
   return (
@@ -75,6 +83,16 @@ export function Sidebar({ modules, currentPath }: SidebarProps): React.JSX.Eleme
         </div>
       </nav>
       <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+        {user && (
+          <div className="px-3 mb-3">
+            <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
+              {user.first_name && user.last_name
+                ? `${user.first_name} ${user.last_name}`
+                : user.email}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.esn_name}</p>
+          </div>
+        )}
         <LogoutButton />
       </div>
     </aside>
