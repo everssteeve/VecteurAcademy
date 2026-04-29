@@ -10,7 +10,7 @@
 | INTENT-002 | Contenu modules + quiz de fin de parcours | Steeve Evers | 2026-04-27 | SPEC-005 à 007 | archivé |
 | INTENT-003 | Auth + gestion utilisateur (login, progression, quiz) | Steeve Evers | 2026-04-28 | SPEC-008 à 010 | archivé |
 | INTENT-004 | Avatars formateurs dans les modules | Steeve Evers | 2026-04-28 | SPEC-011 | archivé |
-| INTENT-005 | Dashboard progression + logout | Steeve Evers | 2026-04-28 | SPEC-012, SPEC-013 | validé |
+| INTENT-005 | Dashboard progression + logout | Steeve Evers | 2026-04-28 | SPEC-012, SPEC-013 | archivé |
 
 ## Statuts possibles
 
