@@ -49,7 +49,13 @@ async def client() -> AsyncClient:
     app.dependency_overrides.clear()
 
 
-_VALID_USER = {"email": "test@esn.fr", "password": "Secur3P@ss", "esn_name": "TestESN"}
+_VALID_USER = {
+    "email": "test@esn.fr",
+    "password": "Secur3P@ss",
+    "first_name": "Test",
+    "last_name": "User",
+    "esn_name": "TestESN",
+}
 
 
 async def test_register_success(client: AsyncClient):

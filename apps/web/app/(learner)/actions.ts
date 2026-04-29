@@ -1,6 +1,7 @@
 "use server"
 
 import { auth } from "@/auth"
+import { createApiToken } from "@/lib/api-token"
 
 const rawApiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
 const API_URL = rawApiUrl.startsWith("http") ? rawApiUrl : `https://${rawApiUrl}`
@@ -9,10 +10,14 @@ export async function markModuleStartedAction(moduleId: string): Promise<void> {
   const session = await auth()
   if (!session?.user?.id) return
   try {
+    const token = await createApiToken(session.user.id)
     await fetch(`${API_URL}/progress/module`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: session.user.id, module_id: moduleId }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ module_id: moduleId }),
     })
   } catch {
     // fire & forget — page renders regardless
@@ -34,11 +39,14 @@ export async function saveModuleQuizResultAction(
   const session = await auth()
   if (!session?.user?.id) return
   try {
+    const token = await createApiToken(session.user.id)
     await fetch(`${API_URL}/quiz/result`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({
-        user_id: session.user.id,
         quiz_type: "module",
         module_id: moduleId,
         score,
@@ -58,11 +66,14 @@ export async function saveFinalQuizResultAction(
   const session = await auth()
   if (!session?.user?.id) return
   try {
+    const token = await createApiToken(session.user.id)
     await fetch(`${API_URL}/quiz/result`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({
-        user_id: session.user.id,
         quiz_type: "final",
         module_id: null,
         score,

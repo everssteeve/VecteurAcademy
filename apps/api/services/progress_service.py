@@ -6,8 +6,8 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.user import ModuleProgress, QuizResult
-from schemas.progress import ProgressRead, QuizResultWithUser
-from schemas.user import ModuleProgressRead, QuizResultRead
+from schemas.progress import ProgressRead
+from schemas.user import ModuleProgressRead, QuizResultCreate, QuizResultRead
 
 
 class ProgressService:
@@ -42,9 +42,11 @@ class ProgressService:
         await self.session.execute(stmt)
         await self.session.commit()
 
-    async def save_quiz_result(self, data: QuizResultWithUser) -> QuizResultRead:
+    async def save_quiz_result_for_user(
+        self, user_id: uuid.UUID, data: QuizResultCreate
+    ) -> QuizResultRead:
         quiz_result = QuizResult(
-            user_id=data.user_id,
+            user_id=user_id,
             quiz_type=data.quiz_type,
             module_id=data.module_id,
             score=data.score,
@@ -57,7 +59,7 @@ class ProgressService:
             stmt = (
                 insert(ModuleProgress)
                 .values(
-                    user_id=data.user_id,
+                    user_id=user_id,
                     module_id=data.module_id,
                     completed_at=datetime.now(UTC),
                 )

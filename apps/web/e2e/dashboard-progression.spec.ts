@@ -1,10 +1,21 @@
 import { expect, test } from "@playwright/test"
+import { SignJWT } from "jose"
 
 // page.route() n'intercepte pas les fetch() exécutés côté serveur (Server Component Next.js).
 // Les tests utilisent les données réelles du test user ou l'API FastAPI directement.
 
 const E2E_USER_ID = "b96cb0fc-093f-4804-920c-35e185e1c5ae"
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
+const JWT_SECRET = process.env.JWT_SECRET ?? "test-secret-min-32-chars-required!!"
+
+async function makeE2eToken(userId: string): Promise<string> {
+  const secret = new TextEncoder().encode(JWT_SECRET)
+  return new SignJWT({ sub: userId })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("5m")
+    .sign(secret)
+}
 
 test.describe("Dashboard progression — SPEC-013", () => {
   test.describe.configure({ mode: "serial" })
@@ -37,7 +48,10 @@ test.describe("Dashboard progression — SPEC-013", () => {
   test("0 tentative finale affiche le message vide", async ({ page }) => {
     // Conditionnel : skip si un résultat final existe déjà en DB (non idempotent par design —
     // la DB de test n'est pas nettoyée entre les runs. Relancer le setup e2e pour repartir à 0.)
-    const resp = await fetch(`${API_URL}/progress?user_id=${E2E_USER_ID}`)
+    const token = await makeE2eToken(E2E_USER_ID)
+    const resp = await fetch(`${API_URL}/progress`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
     const data = await resp.json()
     const hasFinal = data.quiz_results.some((r: { quiz_type: string }) => r.quiz_type === "final")
     if (hasFinal) {
@@ -51,6 +65,7 @@ test.describe("Dashboard progression — SPEC-013", () => {
 
   test("tentative finale affiche score et niveau de certification", async ({ request, page }) => {
     // POST un résultat final via l'API réelle (score 14/18 → 🟠 AI Engineer Junior)
+    const token = await makeE2eToken(E2E_USER_ID)
     const res = await request.post(`${API_URL}/quiz/result`, {
       data: {
         quiz_type: "final",
@@ -58,8 +73,8 @@ test.describe("Dashboard progression — SPEC-013", () => {
         score: 14,
         max_score: 18,
         answers: [],
-        user_id: E2E_USER_ID,
       },
+      headers: { Authorization: `Bearer ${token}` },
     })
     expect(res.status()).toBe(201)
 

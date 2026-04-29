@@ -11,6 +11,7 @@
 | INTENT-003 | Auth + gestion utilisateur (login, progression, quiz) | Steeve Evers | 2026-04-28 | SPEC-008 à 010 | archivé |
 | INTENT-004 | Avatars formateurs dans les modules | Steeve Evers | 2026-04-28 | SPEC-011 | archivé |
 | INTENT-005 | Dashboard progression + logout | Steeve Evers | 2026-04-28 | SPEC-012, SPEC-013 | archivé |
+| INTENT-006 | Durcissement sécurité pré-production | Steeve Evers | 2026-04-29 | SPEC-014 à 019 | draft |
 
 ## Statuts possibles
 

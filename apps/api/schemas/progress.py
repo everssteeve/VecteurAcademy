@@ -1,17 +1,10 @@
-import uuid
-
 from pydantic import BaseModel
 
-from schemas.user import ModuleProgressRead, QuizResultCreate, QuizResultRead
+from schemas.user import ModuleProgressRead, QuizResultRead
 
 
 class ModuleStartRequest(BaseModel):
-    user_id: uuid.UUID
     module_id: str
-
-
-class QuizResultWithUser(QuizResultCreate):
-    user_id: uuid.UUID
 
 
 class ProgressRead(BaseModel):

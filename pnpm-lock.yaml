@@ -19,6 +19,9 @@ importers:
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
+      jose:
+        specifier: ^6.2.2
+        version: 6.2.2
       next:
         specifier: 15.5.15
         version: 15.5.15(@playwright/test@1.59.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)

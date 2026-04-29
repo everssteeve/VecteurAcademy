@@ -17,6 +17,58 @@
 
 <!-- Ajoutez vos entrées ci-dessous, les plus récentes en haut -->
 
+## 2026-04-29 — SPEC-014 — Drift Lock ✅ (statut `done`)
+
+**Auteur** : Steeve Evers (PE) via Claude Code (`/sdd-spec` + `/sdd-gate` + `/sdd-exec` + `/sdd-validate` + `/sdd-drift-check`)
+**Raison** : Clôture SPEC-014 — Authentification JWT côté API (findings #1 IDOR + #2 JWT absent — INTENT-006)
+**Impact** : SPEC-014 → `done` ; findings 🔴 #1 et #2 fermés
+
+### Résultats validation
+
+- Ruff (lint Python) : ✅ PASS — 0 erreur
+- Biome (lint TypeScript) : ✅ PASS — 0 erreur
+- TypeScript typecheck : ✅ PASS — 0 erreur
+- Pytest `tests/test_progress.py` : ✅ 12/12 (5 nouveaux tests 401 + 7 tests fonctionnels mis à jour)
+- Pytest `tests/test_auth.py` : ⚠️ 3 ÉCHECS PRÉ-EXISTANTS (non causés par SPEC-014, voir note)
+
+### Fichiers créés (code — périmètre SPEC-014)
+
+- `apps/api/deps.py` — `CurrentUser` + `get_current_user()` : HS256, header optionnel → 401 propre si absent
+- `apps/web/lib/api-token.ts` — `createApiToken(userId)` : JWT HS256 5 min via `jose`
+- `apps/web/e2e/security-escalation.spec.ts` — 5 tests sécurité : 4× 401 + escalation horizontale
+
+### Fichiers modifiés (code — périmètre SPEC-014)
+
+- `apps/api/schemas/progress.py` — `user_id` supprimé de `ModuleStartRequest` ; `QuizResultWithUser` supprimé
+- `apps/api/services/progress_service.py` — `save_quiz_result` → `save_quiz_result_for_user(user_id, data)`
+- `apps/api/routers/progress.py` — 3 routes protégées via `Depends(get_current_user)`
+- `apps/web/app/(learner)/actions.ts` — `Authorization: Bearer` ajouté ; `user_id` retiré des bodies
+- `apps/web/e2e/dashboard-progression.spec.ts` — adapté pour JWT (`makeE2eToken`) + suppression `?user_id=`
+- `apps/web/package.json` — `jose` ajouté en dep directe
+
+### Drift documenté (intentionnel)
+
+- **Drift A** — `authorization: Annotated[str | None, Header()] = None` au lieu de `Annotated[str, Header()]`. Raison : FastAPI retourne 422 (validation error) si un header requis est absent, pas 401. Pour respecter RFC 7235 et le critère d'acceptation "401 si header absent", le header doit être rendu optionnel avec gestion explicite du `None`. SPEC §4 mise à jour en conséquence.
+
+### Note : test_auth.py pré-existant
+
+3 tests (`test_register_success`, `test_register_duplicate_email`, `test_login_success`) utilisent `_VALID_USER` sans `first_name`/`last_name` requis depuis la migration `0002_add_first_last_name_to_users`. Échecs identiques sur le code BASE (avant SPEC-014). **À corriger dans une PR dédiée — hors périmètre SPEC-014.**
+
+### Vérification Critères de Drift INTENT-006
+
+| Signal | Statut |
+|--------|--------|
+| 1. Endpoint sans JWT → 200 au lieu de 401 | **FERMÉ ✅** |
+| 2. Schéma Pydantic avec `user_id` en body/query | **FERMÉ ✅** |
+| 3-6. Autres signaux | Non couverts → SPEC-015 à 018 |
+
+### Artefacts AIAD mis à jour
+
+- `specs/SPEC-014-jwt-auth-api.md` → statut `done` ; §4 Interface corrigée (drift A) ; DoOD à cocher
+- `specs/_index.md` → statut `done`
+- `AGENT-GUIDE.md` → Lesson Learned FastAPI Header 422 vs 401 ajouté
+- `CHANGELOG-ARTEFACTS.md` (cette entrée)
+
 ## 2026-04-28 — SPEC-013 — Drift Lock ✅ (statut `done`) + INTENT-005 → `livré`
 
 **Auteur** : Steeve Evers (PE) via Claude Code (`/sdd-exec` + `/sdd-validate` + `/sdd-drift-check`)
