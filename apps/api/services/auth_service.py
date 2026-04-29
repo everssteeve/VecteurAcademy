@@ -19,7 +19,9 @@ class AuthService:
         self.session = session
 
     async def register(self, data: UserCreate) -> UserRead:
-        result = await self.session.execute(select(User).where(User.email == data.email))
+        result = await self.session.execute(
+            select(User).where(User.email == data.email)
+        )
         if result.scalar_one_or_none() is not None:
             raise EmailAlreadyExistsError
 
@@ -27,7 +29,13 @@ class AuthService:
             data.password.encode("utf-8"), bcrypt.gensalt(rounds=12)
         ).decode("utf-8")
 
-        user = User(email=data.email, password_hash=password_hash, esn_name=data.esn_name)
+        user = User(
+            email=data.email,
+            password_hash=password_hash,
+            first_name=data.first_name,
+            last_name=data.last_name,
+            esn_name=data.esn_name,
+        )
         self.session.add(user)
         await self.session.commit()
         await self.session.refresh(user)
