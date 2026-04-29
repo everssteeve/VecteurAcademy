@@ -44,24 +44,39 @@ export async function registerAction(
   })
   if (!parsed.success) return { error: parsed.error.issues[0].message }
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.startsWith("http")
-    ? process.env.NEXT_PUBLIC_API_URL
-    : `https://${process.env.NEXT_PUBLIC_API_URL}`
-  const res = await fetch(`${apiUrl}/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: parsed.data.email,
-      password: parsed.data.password,
-      first_name: parsed.data.first_name,
-      last_name: parsed.data.last_name,
-      esn_name: parsed.data.esn_name,
-    }),
-    cache: "no-store",
-  })
+  const rawApiUrl = process.env.NEXT_PUBLIC_API_URL
+  if (!rawApiUrl) return { error: "Configuration serveur invalide. Contactez le support." }
+  const apiUrl = rawApiUrl.startsWith("http") ? rawApiUrl : `https://${rawApiUrl}`
+
+  let res: Response
+  try {
+    res = await fetch(`${apiUrl}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: parsed.data.email,
+        password: parsed.data.password,
+        first_name: parsed.data.first_name,
+        last_name: parsed.data.last_name,
+        esn_name: parsed.data.esn_name,
+      }),
+      cache: "no-store",
+    })
+  } catch {
+    return { error: "Impossible de contacter le serveur. Réessayez dans quelques instants." }
+  }
 
   if (!res.ok) {
     if (res.status === 409) return { error: "Cette adresse email est déjà utilisée." }
+    const body: unknown = await res.json().catch(() => null)
+    if (
+      body &&
+      typeof body === "object" &&
+      "detail" in body &&
+      typeof (body as { detail: unknown }).detail === "string"
+    ) {
+      return { error: (body as { detail: string }).detail }
+    }
     return { error: "Erreur lors de la création du compte. Réessayez." }
   }
 

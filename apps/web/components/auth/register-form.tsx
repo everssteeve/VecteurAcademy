@@ -13,9 +13,30 @@ type FieldErrors = {
   confirmPassword?: string
 }
 
+type FieldValues = {
+  first_name: string
+  last_name: string
+  email: string
+  esn_name: string
+  password: string
+  confirmPassword: string
+}
+
 export function RegisterForm() {
   const [serverState, formAction, isPending] = useActionState(registerAction, null)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
+  const [values, setValues] = useState<FieldValues>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    esn_name: "",
+    password: "",
+    confirmPassword: "",
+  })
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  }
 
   function validateClient(event: React.FormEvent<HTMLFormElement>) {
     const fd = new FormData(event.currentTarget)
@@ -61,6 +82,8 @@ export function RegisterForm() {
               type="text"
               autoComplete="given-name"
               required
+              value={values.first_name}
+              onChange={handleChange}
               className={inputClass}
               aria-invalid={fieldErrors.first_name ? true : undefined}
               aria-describedby={fieldErrors.first_name ? "first-name-error" : undefined}
@@ -89,6 +112,8 @@ export function RegisterForm() {
               type="text"
               autoComplete="family-name"
               required
+              value={values.last_name}
+              onChange={handleChange}
               className={inputClass}
               aria-invalid={fieldErrors.last_name ? true : undefined}
               aria-describedby={fieldErrors.last_name ? "last-name-error" : undefined}
@@ -118,6 +143,8 @@ export function RegisterForm() {
             type="email"
             autoComplete="email"
             required
+            value={values.email}
+            onChange={handleChange}
             className={inputClass}
             aria-invalid={fieldErrors.email ? true : undefined}
             aria-describedby={fieldErrors.email ? "email-error" : undefined}
@@ -146,6 +173,8 @@ export function RegisterForm() {
             type="text"
             autoComplete="organization"
             required
+            value={values.esn_name}
+            onChange={handleChange}
             className={inputClass}
             aria-invalid={fieldErrors.esn_name ? true : undefined}
             aria-describedby={fieldErrors.esn_name ? "esn-name-error" : undefined}
@@ -174,6 +203,8 @@ export function RegisterForm() {
             type="password"
             autoComplete="new-password"
             required
+            value={values.password}
+            onChange={handleChange}
             className={inputClass}
             aria-invalid={fieldErrors.password ? true : undefined}
             aria-describedby={fieldErrors.password ? "password-error" : undefined}
@@ -202,6 +233,8 @@ export function RegisterForm() {
             type="password"
             autoComplete="new-password"
             required
+            value={values.confirmPassword}
+            onChange={handleChange}
             className={inputClass}
             aria-invalid={fieldErrors.confirmPassword ? true : undefined}
             aria-describedby={fieldErrors.confirmPassword ? "confirm-password-error" : undefined}
