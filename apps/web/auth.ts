@@ -22,7 +22,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!parsed.success) return null
 
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+          const rawUrl = process.env.NEXT_PUBLIC_API_URL ?? ""
+          const apiUrl = rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`
+          const res = await fetch(`${apiUrl}/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: parsed.data.email, password: parsed.data.password }),

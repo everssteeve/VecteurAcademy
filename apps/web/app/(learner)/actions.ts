@@ -2,7 +2,8 @@
 
 import { auth } from "@/auth"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
+const rawApiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
+const API_URL = rawApiUrl.startsWith("http") ? rawApiUrl : `https://${rawApiUrl}`
 
 export async function markModuleStartedAction(moduleId: string): Promise<void> {
   const session = await auth()

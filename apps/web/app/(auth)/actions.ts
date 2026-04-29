@@ -44,7 +44,10 @@ export async function registerAction(
   })
   if (!parsed.success) return { error: parsed.error.issues[0].message }
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.startsWith("http")
+    ? process.env.NEXT_PUBLIC_API_URL
+    : `https://${process.env.NEXT_PUBLIC_API_URL}`
+  const res = await fetch(`${apiUrl}/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
